@@ -1,0 +1,7 @@
+dataset/*
+!dataset/.gitkeep
+outputs/predictions/*
+outputs/visualizations/*
+models/*.pth
+__pycache__/
+*.pyc

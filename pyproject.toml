@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "diabetic-retinopathy-screening"
+version = "1.0.0"
+description = "APTOS 2019 Diabetic Retinopathy Screening with EfficientNetB0 and image quality assessment"
+readme = "PROJECT_REPORT.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [
+    { name = "SIH-DIABETES Team" },
+]
+keywords = ["diabetic retinopathy", "aptos", "medical ai", "fastapi", "efficientnet"]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Medical Science Apps.",
+]
+
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "python-multipart>=0.0.6",
+    "pydantic>=2.5.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "slowapi>=0.1.9",
+    "opencv-python-headless>=4.10.0,<5.0",
+    "numpy>=1.26.0,<2.5.0",
+    "pillow>=10.1.0,<13.0",
+    "scikit-image>=0.22.0,<1.0",
+    "tensorflow-cpu==2.21.0",
+    "keras==3.13.2",
+    "python-dotenv>=1.0.0,<2.0",
+    "pyyaml>=6.0,<7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.5.0",
+    "httpx2>=2.13.0,<3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/SIH-DIABETES/SIH-DIABETES"
+Repository = "https://github.com/SIH-DIABETES/SIH-DIABETES"
+
+[tool.setuptools]
+packages = ["image_quality"]
+package-dir = { "image_quality" = "aptos final/image_quality" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["aptos final/image_quality"]
+python_files = ["test_*.py"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
