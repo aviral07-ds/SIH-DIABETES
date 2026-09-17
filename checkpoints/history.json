@@ -1,0 +1,330 @@
+{
+  "epochs": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "train_loss": [
+    1.5348796248435974,
+    1.4527963002522786,
+    1.4014238516489665,
+    1.357278843720754,
+    1.3158502181371052
+  ],
+  "val_loss": [
+    1.6219732761383057,
+    1.5422476927439372,
+    1.4660135507583618,
+    1.4192909399668376,
+    1.4020252227783203
+  ],
+  "metrics": [
+    {
+      "MA": {
+        "name": "Microaneurysms (MA)",
+        "dice": 2.0833333328993052e-10,
+        "iou": 2.0833333328993052e-10,
+        "precision": 1.0,
+        "recall": 2.0833333328993052e-10,
+        "tp": 0,
+        "fp": 0,
+        "fn": 480,
+        "tn": 392736,
+        "gt_pixel_count": 480,
+        "pred_pixel_count": 0
+      },
+      "HE": {
+        "name": "Hemorrhages (HE)",
+        "dice": 2.923121894097541e-11,
+        "iou": 2.923121894097541e-11,
+        "precision": 2.4999999375000013e-08,
+        "recall": 2.926543751743443e-11,
+        "tp": 0,
+        "fp": 4,
+        "fn": 3417,
+        "tn": 389795,
+        "gt_pixel_count": 3417,
+        "pred_pixel_count": 4
+      },
+      "EX": {
+        "name": "Hard Exudates (EX)",
+        "dice": 0.15652847735070655,
+        "iou": 0.08490962591246512,
+        "precision": 0.09582542696641781,
+        "recall": 0.4270613108428054,
+        "tp": 404,
+        "fp": 3812,
+        "fn": 542,
+        "tn": 388458,
+        "gt_pixel_count": 946,
+        "pred_pixel_count": 4216
+      },
+      "SE": {
+        "name": "Soft Exudates (SE)",
+        "dice": 0.023131238735643996,
+        "iou": 0.011700948079678421,
+        "precision": 0.011700948079678421,
+        "recall": 1.0,
+        "tp": 4601,
+        "fp": 388615,
+        "fn": 0,
+        "tn": 0,
+        "gt_pixel_count": 4601,
+        "pred_pixel_count": 393216
+      },
+      "Mean": {
+        "name": "Mean / Overall",
+        "dice": 0.04491492908097877,
+        "iou": 0.024152643557427023,
+        "precision": 0.2768816000115239,
+        "recall": 0.35676532777010106
+      }
+    },
+    {
+      "MA": {
+        "name": "Microaneurysms (MA)",
+        "dice": 2.0833333328993052e-10,
+        "iou": 2.0833333328993052e-10,
+        "precision": 1.0,
+        "recall": 2.0833333328993052e-10,
+        "tp": 0,
+        "fp": 0,
+        "fn": 480,
+        "tn": 392736,
+        "gt_pixel_count": 480,
+        "pred_pixel_count": 0
+      },
+      "HE": {
+        "name": "Hemorrhages (HE)",
+        "dice": 0.7421413377482611,
+        "iou": 0.5900037579934234,
+        "precision": 0.6223984142790406,
+        "recall": 0.9189347380767067,
+        "tp": 3140,
+        "fp": 1905,
+        "fn": 277,
+        "tn": 387894,
+        "gt_pixel_count": 3417,
+        "pred_pixel_count": 5045
+      },
+      "EX": {
+        "name": "Hard Exudates (EX)",
+        "dice": 0.11376146790152344,
+        "iou": 0.0603112840597511,
+        "precision": 0.06493117894875926,
+        "recall": 0.4587737844123918,
+        "tp": 434,
+        "fp": 6250,
+        "fn": 512,
+        "tn": 386020,
+        "gt_pixel_count": 946,
+        "pred_pixel_count": 6684
+      },
+      "SE": {
+        "name": "Soft Exudates (SE)",
+        "dice": 0.5182473530101473,
+        "iou": 0.3497529456529855,
+        "precision": 0.3497529456529855,
+        "recall": 1.0,
+        "tp": 4601,
+        "fp": 8554,
+        "fn": 0,
+        "tn": 380061,
+        "gt_pixel_count": 4601,
+        "pred_pixel_count": 13155
+      },
+      "Mean": {
+        "name": "Mean / Overall",
+        "dice": 0.3435375397170663,
+        "iou": 0.25001699697862334,
+        "precision": 0.5092706347201963,
+        "recall": 0.5944271306743579
+      }
+    },
+    {
+      "MA": {
+        "name": "Microaneurysms (MA)",
+        "dice": 2.0833333328993052e-10,
+        "iou": 2.0833333328993052e-10,
+        "precision": 1.0,
+        "recall": 2.0833333328993052e-10,
+        "tp": 0,
+        "fp": 0,
+        "fn": 480,
+        "tn": 392736,
+        "gt_pixel_count": 480,
+        "pred_pixel_count": 0
+      },
+      "HE": {
+        "name": "Hemorrhages (HE)",
+        "dice": 0.10690465603902226,
+        "iou": 0.05647082508630596,
+        "precision": 0.05651918394919567,
+        "recall": 0.9850746268661085,
+        "tp": 3366,
+        "fp": 56189,
+        "fn": 51,
+        "tn": 333610,
+        "gt_pixel_count": 3417,
+        "pred_pixel_count": 59555
+      },
+      "EX": {
+        "name": "Hard Exudates (EX)",
+        "dice": 0.28600201411307147,
+        "iou": 0.16686251470818184,
+        "precision": 0.17666086093116046,
+        "recall": 0.7505285412525868,
+        "tp": 710,
+        "fp": 3309,
+        "fn": 236,
+        "tn": 388961,
+        "gt_pixel_count": 946,
+        "pred_pixel_count": 4019
+      },
+      "SE": {
+        "name": "Soft Exudates (SE)",
+        "dice": 0.6562544572838664,
+        "iou": 0.48837703004470456,
+        "precision": 0.48837703004470456,
+        "recall": 1.0,
+        "tp": 4601,
+        "fp": 4820,
+        "fn": 0,
+        "tn": 383795,
+        "gt_pixel_count": 4601,
+        "pred_pixel_count": 9421
+      },
+      "Mean": {
+        "name": "Mean / Overall",
+        "dice": 0.2622902819110734,
+        "iou": 0.17792759251188142,
+        "precision": 0.43038926873126515,
+        "recall": 0.6839007920817571
+      }
+    },
+    {
+      "MA": {
+        "name": "Microaneurysms (MA)",
+        "dice": 2.0833333328993052e-10,
+        "iou": 2.0833333328993052e-10,
+        "precision": 1.0,
+        "recall": 2.0833333328993052e-10,
+        "tp": 0,
+        "fp": 0,
+        "fn": 480,
+        "tn": 392736,
+        "gt_pixel_count": 480,
+        "pred_pixel_count": 0
+      },
+      "HE": {
+        "name": "Hemorrhages (HE)",
+        "dice": 0.05666091047955163,
+        "iou": 0.029156471346615875,
+        "precision": 0.029161729095583525,
+        "recall": 0.9938542581213388,
+        "tp": 3396,
+        "fp": 113058,
+        "fn": 21,
+        "tn": 276741,
+        "gt_pixel_count": 3417,
+        "pred_pixel_count": 116454
+      },
+      "EX": {
+        "name": "Hard Exudates (EX)",
+        "dice": 0.6735504368676113,
+        "iou": 0.5077844311671985,
+        "precision": 0.5394402035916386,
+        "recall": 0.8964059196726843,
+        "tp": 848,
+        "fp": 724,
+        "fn": 98,
+        "tn": 391546,
+        "gt_pixel_count": 946,
+        "pred_pixel_count": 1572
+      },
+      "SE": {
+        "name": "Soft Exudates (SE)",
+        "dice": 0.6392053348177327,
+        "iou": 0.46972945380837433,
+        "precision": 0.46972945380837433,
+        "recall": 1.0,
+        "tp": 4601,
+        "fp": 5194,
+        "fn": 0,
+        "tn": 383421,
+        "gt_pixel_count": 4601,
+        "pred_pixel_count": 9795
+      },
+      "Mean": {
+        "name": "Mean / Overall",
+        "dice": 0.3423541705933072,
+        "iou": 0.2516675891326305,
+        "precision": 0.5095828466238991,
+        "recall": 0.7225650445005891
+      }
+    },
+    {
+      "MA": {
+        "name": "Microaneurysms (MA)",
+        "dice": 2.0833333328993052e-10,
+        "iou": 2.0833333328993052e-10,
+        "precision": 1.0,
+        "recall": 2.0833333328993052e-10,
+        "tp": 0,
+        "fp": 0,
+        "fn": 480,
+        "tn": 392736,
+        "gt_pixel_count": 480,
+        "pred_pixel_count": 0
+      },
+      "HE": {
+        "name": "Hemorrhages (HE)",
+        "dice": 0.05125309604004242,
+        "iou": 0.026300540073534655,
+        "precision": 0.02630318203669904,
+        "recall": 0.9961954931227335,
+        "tp": 3404,
+        "fp": 126010,
+        "fn": 13,
+        "tn": 263789,
+        "gt_pixel_count": 3417,
+        "pred_pixel_count": 129414
+      },
+      "EX": {
+        "name": "Hard Exudates (EX)",
+        "dice": 0.5469314079558686,
+        "iou": 0.3763975155537724,
+        "precision": 0.3822539949797202,
+        "recall": 0.9608879492641768,
+        "tp": 909,
+        "fp": 1469,
+        "fn": 37,
+        "tn": 390801,
+        "gt_pixel_count": 946,
+        "pred_pixel_count": 2378
+      },
+      "SE": {
+        "name": "Soft Exudates (SE)",
+        "dice": 0.6187882455812065,
+        "iou": 0.44800389484471265,
+        "precision": 0.44800389484471265,
+        "recall": 1.0,
+        "tp": 4601,
+        "fp": 5669,
+        "fn": 0,
+        "tn": 382946,
+        "gt_pixel_count": 4601,
+        "pred_pixel_count": 10270
+      },
+      "Mean": {
+        "name": "Mean / Overall",
+        "dice": 0.3042431874463627,
+        "iou": 0.21267548767008826,
+        "precision": 0.46414026796528296,
+        "recall": 0.7392708606488109
+      }
+    }
+  ]
+}
