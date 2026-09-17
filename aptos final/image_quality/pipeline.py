@@ -24,15 +24,18 @@ class QualityResult:
     processed_image_path: str | None
 
     def to_dict(self) -> dict:
-        """Return scalar metadata while retaining the processed image separately."""
+        """Return JSON-serializable metadata only.
+
+        ``processed_image`` (a NumPy array) is intentionally excluded because
+        it is not JSON-serializable. Consumers that need the array should
+        access ``result.processed_image`` directly.
+        """
         result = self.assessment.to_dict()
         result.update({
             "enhancement_applied": self.enhancement_applied,
             "enhancements_used": list(self.enhancements_used),
             "recapture_required": self.recapture_required,
             "recapture_feedback": self.recapture_feedback,
-            "processed_image_path": self.processed_image_path,
-            "processed_image": self.processed_image,
         })
         return result
 
