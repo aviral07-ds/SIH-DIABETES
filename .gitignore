@@ -86,3 +86,23 @@ data/
 # Docker
 *.dockerignore
 Dockerfile.local
+# Python & Virtualenv
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# System & OS
+.DS_Store
+.idea/
+.vscode/
+
+# Datasets & Temp Files
+data/
+temp_uploads/
+output_predictions/
+eval_results/
+
+# Log & Checkpoint cache (optional: keep best_model.pth if under 100MB, exclude checkpoints folder binary dumps if needed)
+*.log
