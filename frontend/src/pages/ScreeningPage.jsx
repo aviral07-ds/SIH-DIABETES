@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Upload, FileImage, User, Eye, Sparkles, AlertCircle, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { analyzeRetinaImage } from '../services/apiService';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ScreeningPage({ onAnalysisComplete }) {
+  const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -24,9 +25,9 @@ export default function ScreeningPage({ onAnalysisComplete }) {
 
   // Pre-loaded sample fundus images for instant demo
   const sampleFundusImages = [
-    { id: 'sample1', label: 'Sample 1: Moderate NPDR (IDRiD_01)', fileUrl: '/samples/idrid_01.jpg', desc: 'Microaneurysms + Hemorrhages' },
-    { id: 'sample2', label: 'Sample 2: Severe Exudate Cluster', fileUrl: '/samples/idrid_02.jpg', desc: 'Hard Exudates Circinate' },
-    { id: 'sample3', label: 'Sample 3: Normal Healthy Retina', fileUrl: '/samples/idrid_03.jpg', desc: 'Clear Fundus' }
+    { id: 'sample1', label: 'Sample 1: Moderate NPDR (IDRiD_01)', desc: 'Microaneurysms + Hemorrhages' },
+    { id: 'sample2', label: 'Sample 2: Severe Exudate Cluster', desc: 'Hard Exudates Circinate' },
+    { id: 'sample3', label: 'Sample 3: Normal Healthy Retina', desc: 'Clear Fundus' }
   ];
 
   const handleFileChange = (e) => {
@@ -38,13 +39,11 @@ export default function ScreeningPage({ onAnalysisComplete }) {
   };
 
   const handleSelectSample = async (sample) => {
-    // Generate sample image file dynamically from canvas for instant zero-config testing
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Draw fundus circle
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, 512, 512);
     ctx.beginPath();
@@ -52,13 +51,11 @@ export default function ScreeningPage({ onAnalysisComplete }) {
     ctx.fillStyle = '#C85010';
     ctx.fill();
 
-    // Optic Disc
     ctx.beginPath();
     ctx.arc(360, 230, 40, 0, 2 * Math.PI);
     ctx.fillStyle = '#FFE090';
     ctx.fill();
 
-    // Blood vessels
     ctx.strokeStyle = '#600505';
     ctx.lineWidth = 6;
     ctx.beginPath();
@@ -71,12 +68,10 @@ export default function ScreeningPage({ onAnalysisComplete }) {
     ctx.quadraticCurveTo(280, 300, 180, 380);
     ctx.stroke();
 
-    // Microaneurysms (Red dots)
     ctx.fillStyle = '#880000';
     ctx.beginPath(); ctx.arc(210, 240, 6, 0, 2 * Math.PI); ctx.fill();
     ctx.beginPath(); ctx.arc(230, 290, 8, 0, 2 * Math.PI); ctx.fill();
 
-    // Hard Exudates (Yellow flecks)
     ctx.fillStyle = '#FFFF00';
     ctx.beginPath(); ctx.arc(240, 200, 7, 0, 2 * Math.PI); ctx.fill();
     ctx.beginPath(); ctx.arc(260, 210, 5, 0, 2 * Math.PI); ctx.fill();
@@ -109,17 +104,11 @@ export default function ScreeningPage({ onAnalysisComplete }) {
       setProgress(100);
       clearInterval(interval);
 
-      // Celebrate screening completion
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-
+      // Transition to results cleanly without confetti
       setTimeout(() => {
         setLoading(false);
         onAnalysisComplete(results);
-      }, 400);
+      }, 300);
 
     } catch (e) {
       console.error(e);
@@ -136,9 +125,9 @@ export default function ScreeningPage({ onAnalysisComplete }) {
         <div className="flex justify-between items-center">
           <div>
             <span className="text-xs font-bold text-sky-600 uppercase tracking-widest font-mono">
-              STEP {step} OF 2: {step === 1 ? 'PATIENT & EYE DETAILS' : 'FUNDUS IMAGE UPLOAD'}
+              {step === 1 ? t.step1Tag : t.step2Tag}
             </span>
-            <h1 className="text-2xl font-extrabold text-slate-900 mt-1">Point-of-Care Retina Screening Workflow</h1>
+            <h1 className="text-2xl font-extrabold text-slate-900 mt-1">{t.workflowTitle}</h1>
           </div>
           <div className="flex items-center space-x-2 text-xs font-semibold">
             <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step === 1 ? 'bg-sky-600 text-white' : 'bg-emerald-600 text-white'}`}>1</span>
@@ -156,14 +145,14 @@ export default function ScreeningPage({ onAnalysisComplete }) {
               <User className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-slate-900 text-base">Patient Demographics & Clinical Context</h2>
-              <p className="text-xs text-slate-500">ABDM M3 Compliant Health Card Metadata</p>
+              <h2 className="font-bold text-slate-900 text-base">{t.demographicsTitle}</h2>
+              <p className="text-xs text-slate-500">{t.demographicsDesc}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Patient Full Name</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t.patientName}</label>
               <input 
                 type="text" 
                 value={patient.name}
@@ -173,7 +162,7 @@ export default function ScreeningPage({ onAnalysisComplete }) {
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">ABHA Health Identifier Number</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t.abhaId}</label>
               <input 
                 type="text" 
                 value={patient.abhaId}
@@ -183,7 +172,7 @@ export default function ScreeningPage({ onAnalysisComplete }) {
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Age & Gender</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t.ageGender}</label>
               <div className="grid grid-cols-2 gap-3">
                 <input 
                   type="number" 
@@ -196,27 +185,27 @@ export default function ScreeningPage({ onAnalysisComplete }) {
                   onChange={(e) => setPatient({...patient, gender: e.target.value})}
                   className="p-3 rounded-xl border border-slate-300 font-medium"
                 >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  <option value="Male">{t.male}</option>
+                  <option value="Female">{t.female}</option>
+                  <option value="Other">{t.other}</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Examined Eye (Laterality)</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t.examinedEye}</label>
               <select 
                 value={patient.eye}
                 onChange={(e) => setPatient({...patient, eye: e.target.value})}
                 className="w-full p-3 rounded-xl border border-slate-300 font-medium"
               >
-                <option value="OD [Right Eye]">OD [Right Eye] - Macula Centered</option>
-                <option value="OS [Left Eye]">OS [Left Eye] - Macula Centered</option>
+                <option value="OD [Right Eye]">{t.rightEye}</option>
+                <option value="OS [Left Eye]">{t.leftEye}</option>
               </select>
             </div>
 
             <div className="md:col-span-2">
-              <label className="block font-semibold text-slate-700 mb-1">Clinical Background & Comorbidities</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t.clinicalHistory}</label>
               <input 
                 type="text" 
                 value={patient.history}
@@ -231,7 +220,7 @@ export default function ScreeningPage({ onAnalysisComplete }) {
               onClick={() => setStep(2)}
               className="bg-sky-600 hover:bg-sky-700 text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center space-x-2 text-sm shadow"
             >
-              <span>Next: Fundus Capture & Upload</span>
+              <span>{t.nextUpload}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -247,15 +236,15 @@ export default function ScreeningPage({ onAnalysisComplete }) {
                 <FileImage className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="font-bold text-slate-900 text-base">Fundus Photography Input</h2>
-                <p className="text-xs text-slate-500">Supports 45° macula-centered JPG, PNG, or TIFF fundus photography</p>
+                <h2 className="font-bold text-slate-900 text-base">{t.fundusInputTitle}</h2>
+                <p className="text-xs text-slate-500">{t.fundusInputDesc}</p>
               </div>
             </div>
             <button
               onClick={() => setStep(1)}
               className="text-xs text-slate-500 hover:text-slate-800 font-semibold"
             >
-              ← Edit Patient Details
+              {t.editDetails}
             </button>
           </div>
 
@@ -275,7 +264,7 @@ export default function ScreeningPage({ onAnalysisComplete }) {
                   <p className="font-bold text-slate-900 text-sm">{selectedFile?.name}</p>
                   <p className="text-xs text-emerald-600 font-semibold flex items-center justify-center space-x-1 mt-1">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Image Loaded Ready for AI Triage</span>
+                    <span>{t.imageLoaded}</span>
                   </p>
                 </div>
               </div>
@@ -285,8 +274,8 @@ export default function ScreeningPage({ onAnalysisComplete }) {
                   <Upload className="w-8 h-8" />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900 text-base">Drag & Drop Retinal Fundus Scan Here</p>
-                  <p className="text-xs text-slate-500 mt-1">or click to browse local files (Supports non-mydriatic & desktop fundus units)</p>
+                  <p className="font-bold text-slate-900 text-base">{t.dragDropText}</p>
+                  <p className="text-xs text-slate-500 mt-1">{t.dragDropSub}</p>
                 </div>
               </div>
             )}
@@ -294,7 +283,7 @@ export default function ScreeningPage({ onAnalysisComplete }) {
 
           {/* Sample Fundus Quick Picker */}
           <div className="space-y-3 pt-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">Or Select Pre-Configured Sample Fundus Scans (Instant Demo):</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">{t.samplePickerTitle}</label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {sampleFundusImages.map((sample) => (
                 <button
@@ -315,14 +304,13 @@ export default function ScreeningPage({ onAnalysisComplete }) {
               <div className="flex justify-between items-center text-xs font-bold text-sky-900">
                 <span className="flex items-center space-x-2">
                   <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-                  <span>Executing PyTorch U-Net & Grad-CAM++ Inference...</span>
+                  <span>{t.executingAi}</span>
                 </span>
                 <span>{progress}%</span>
               </div>
               <div className="w-full bg-sky-200 h-2 rounded-full overflow-hidden">
                 <div className="bg-sky-600 h-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
               </div>
-              <p className="text-[11px] text-sky-700">Connecting to deployed IDRiD & APTOS microservices on Render cloud...</p>
             </div>
           )}
 
@@ -338,7 +326,7 @@ export default function ScreeningPage({ onAnalysisComplete }) {
               }`}
             >
               <Sparkles className="w-5 h-5" />
-              <span>{loading ? 'Analyzing Retina Image...' : 'Run Neural AI Triage & Analysis'}</span>
+              <span>{loading ? t.analyzingImage : t.runAiTriage}</span>
             </button>
           </div>
 

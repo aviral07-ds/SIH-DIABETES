@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Eye, ShieldCheck, Activity, Globe, Sliders, PlayCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Navbar({ activeTab, setActiveTab, onOpenApiSettings }) {
-  const [lang, setLang] = useState('en');
+  const { lang, toggleLanguage, t } = useLanguage();
 
   const navItems = [
-    { id: 'home', label: 'Home' },
-    { id: 'screening', label: 'Screening' },
-    { id: 'analysis', label: 'Live Analysis' },
-    { id: 'results', label: 'Diagnostic Results' },
-    { id: 'report', label: 'Clinical Report' },
-    { id: 'how-it-works', label: 'How It Works' },
+    { id: 'home', label: t.navHome },
+    { id: 'screening', label: t.navScreening },
+    { id: 'analysis', label: t.navAnalysis },
+    { id: 'results', label: t.navResults },
+    { id: 'report', label: t.navReport },
+    { id: 'how-it-works', label: t.navHowItWorks },
   ];
 
   return (
@@ -19,16 +20,16 @@ export default function Navbar({ activeTab, setActiveTab, onOpenApiSettings }) {
       <div className="bg-slate-900 text-slate-300 text-xs py-1 px-4 flex justify-between items-center border-b border-slate-800">
         <div className="flex items-center space-x-2">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Official Diagnostic Triage Summary • ABDM Interoperable Medical Record • National Health Authority Compliance</span>
+          <span>{t.officialCompliance}</span>
         </div>
         <div className="flex items-center space-x-4">
-          <span className="text-slate-400 hidden sm:inline">Govt. of Maharashtra • Public Health Dept</span>
+          <span className="text-slate-400 hidden sm:inline">{t.govtDept}</span>
           <button 
             onClick={onOpenApiSettings}
             className="hover:text-white flex items-center space-x-1 text-slate-300 transition-colors"
           >
             <Sliders className="w-3 h-3" />
-            <span>API Status</span>
+            <span>{t.apiStatus}</span>
           </button>
         </div>
       </div>
@@ -48,9 +49,9 @@ export default function Navbar({ activeTab, setActiveTab, onOpenApiSettings }) {
             <div>
               <div className="flex items-center space-x-1.5">
                 <span className="font-extrabold text-xl tracking-tight text-slate-900">Retina<span className="text-sky-600">AI</span></span>
-                <span className="bg-sky-100 text-sky-800 text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">CLINICAL TRIAGE</span>
+                <span className="bg-sky-100 text-sky-800 text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">{t.clinicalTriage}</span>
               </div>
-              <p className="text-[10px] text-slate-500 font-medium tracking-wider uppercase">Point-of-Care Diagnostic Engine</p>
+              <p className="text-[10px] text-slate-500 font-medium tracking-wider uppercase">{t.pointOfCareEngine}</p>
             </div>
           </div>
 
@@ -77,21 +78,21 @@ export default function Navbar({ activeTab, setActiveTab, onOpenApiSettings }) {
             {/* SIH Badge */}
             <div className="hidden xl:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-              <span>Smart India Hackathon</span>
+              <span>{t.sihBadge}</span>
             </div>
 
             {/* Offline Edge AI Badge */}
             <div className="hidden md:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
               <Activity className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Offline-Ready Edge AI</span>
+              <span>{t.offlineEdgeAi}</span>
             </div>
 
             {/* Language Switch */}
             <button 
-              onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
-              className="flex items-center space-x-1 text-xs font-semibold text-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+              onClick={toggleLanguage}
+              className="flex items-center space-x-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-all shadow-sm bg-sky-50 border-sky-300 text-sky-900 hover:bg-sky-100"
             >
-              <Globe className="w-3.5 h-3.5 text-slate-500" />
+              <Globe className="w-3.5 h-3.5 text-sky-600" />
               <span>{lang === 'en' ? 'English | हिंदी' : 'हिंदी | English'}</span>
             </button>
 
@@ -101,7 +102,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenApiSettings }) {
               className="flex items-center space-x-1.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm px-4 py-2 rounded-lg shadow-sm hover:shadow transition-all"
             >
               <PlayCircle className="w-4 h-4" />
-              <span>Start Screening</span>
+              <span>{t.startScreening}</span>
             </button>
 
           </div>

@@ -7,6 +7,7 @@ import ScreeningPage from './pages/ScreeningPage';
 import ResultPage from './pages/ResultPage';
 import AnalysisPage from './pages/AnalysisPage';
 import ReportPage from './pages/ReportPage';
+import { LanguageProvider } from './context/LanguageContext';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -19,55 +20,57 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
-      
-      {/* Top Navigation */}
-      <Navbar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        onOpenApiSettings={() => setIsApiSettingsOpen(true)}
-      />
+    <LanguageProvider>
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+        
+        {/* Top Navigation */}
+        <Navbar 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          onOpenApiSettings={() => setIsApiSettingsOpen(true)}
+        />
 
-      {/* Main Content Body */}
-      <main className="flex-1">
-        {activeTab === 'home' && (
-          <HomePage setActiveTab={setActiveTab} />
-        )}
+        {/* Main Content Body */}
+        <main className="flex-1">
+          {activeTab === 'home' && (
+            <HomePage setActiveTab={setActiveTab} />
+          )}
 
-        {activeTab === 'how-it-works' && (
-          <HomePage setActiveTab={setActiveTab} />
-        )}
+          {activeTab === 'how-it-works' && (
+            <HomePage setActiveTab={setActiveTab} />
+          )}
 
-        {activeTab === 'screening' && (
-          <ScreeningPage onAnalysisComplete={handleAnalysisComplete} />
-        )}
+          {activeTab === 'screening' && (
+            <ScreeningPage onAnalysisComplete={handleAnalysisComplete} />
+          )}
 
-        {activeTab === 'result-summary' && (
-          <ResultPage data={screeningData} setActiveTab={setActiveTab} />
-        )}
+          {activeTab === 'result-summary' && (
+            <ResultPage data={screeningData} setActiveTab={setActiveTab} />
+          )}
 
-        {activeTab === 'results' && (
-          <AnalysisPage data={screeningData} setActiveTab={setActiveTab} />
-        )}
+          {activeTab === 'results' && (
+            <AnalysisPage data={screeningData} setActiveTab={setActiveTab} />
+          )}
 
-        {activeTab === 'analysis' && (
-          <AnalysisPage data={screeningData} setActiveTab={setActiveTab} />
-        )}
+          {activeTab === 'analysis' && (
+            <AnalysisPage data={screeningData} setActiveTab={setActiveTab} />
+          )}
 
-        {activeTab === 'report' && (
-          <ReportPage data={screeningData} />
-        )}
-      </main>
+          {activeTab === 'report' && (
+            <ReportPage data={screeningData} />
+          )}
+        </main>
 
-      {/* Footer */}
-      <Footer setActiveTab={setActiveTab} />
+        {/* Footer */}
+        <Footer setActiveTab={setActiveTab} />
 
-      {/* API Settings Modal */}
-      <ApiSettingsModal 
-        isOpen={isApiSettingsOpen} 
-        onClose={() => setIsApiSettingsOpen(false)} 
-      />
+        {/* API Settings Modal */}
+        <ApiSettingsModal 
+          isOpen={isApiSettingsOpen} 
+          onClose={() => setIsApiSettingsOpen(false)} 
+        />
 
-    </div>
+      </div>
+    </LanguageProvider>
   );
 }
