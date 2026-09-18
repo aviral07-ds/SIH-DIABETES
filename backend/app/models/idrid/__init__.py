@@ -1,0 +1,1 @@
+"""IDRiD lesion-segmentation model."""
