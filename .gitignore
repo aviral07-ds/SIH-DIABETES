@@ -30,6 +30,11 @@ env/
 ENV/
 .venv/
 
+# Local deployment credentials
+.env
+.env.*
+!.env.example
+
 # IDE / editor
 .idea/
 .vscode/
@@ -85,6 +90,7 @@ data/
 
 # Docker
 *.dockerignore
+!.dockerignore
 Dockerfile.local
 # Python & Virtualenv
 venv/

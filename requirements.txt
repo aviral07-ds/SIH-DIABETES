@@ -19,6 +19,7 @@ keras==3.13.2
 
 # Utilities
 python-dotenv>=1.0.0,<2.0
+requests>=2.31.0,<3.0
 pyyaml>=6.0,<7.0
 httpx2>=2.13.0,<3.0
 torch>=2.0.0

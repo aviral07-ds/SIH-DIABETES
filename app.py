@@ -11,6 +11,7 @@ from PIL import Image
 import torch
 import streamlit as st
 import pandas as pd
+from render_client import is_configured as render_api_configured, predict as render_predict
 
 from model import UNet
 from dataset import apply_clahe, LESION_TYPES
@@ -86,9 +87,15 @@ def main():
     overlay_alpha = st.sidebar.slider("Overlay Transparency (Alpha)", 0.1, 1.0, 0.55, 0.05)
     use_clahe = st.sidebar.checkbox("Apply CLAHE Enhancement", True)
 
-    model, model_args, device = get_model(checkpoint_path)
+    use_render_api = render_api_configured()
+    if use_render_api:
+        st.sidebar.success("Connected to the Render inference API")
+    else:
+        st.sidebar.info("Local model mode. Add Render credentials to `.env` to use the deployed API.")
 
-    if model is None:
+    model, model_args, device = (None, None, None) if use_render_api else get_model(checkpoint_path)
+
+    if model is None and not use_render_api:
         st.warning(f"⚠️ Model checkpoint not found at `{checkpoint_path}`. Please train the model first using `python train.py` or generate sample data.")
         st.info("💡 You can train a quick demo model by running: `python train.py --epochs 3` in your terminal.")
 
@@ -140,19 +147,47 @@ def main():
 
             st.markdown("---")
 
-            if model is not None and st.button("🚀 Run Lesion Segmentation Model", type="primary", use_container_width=True):
-                with st.spinner("Running U-Net Neural Network Inference..."):
-                    img_size = model_args.get("img_size", 256) if model_args else 256
-                    res = predict_single_image(model, temp_image_path, device, img_size=(img_size, img_size), threshold=threshold, use_clahe=use_clahe)
+            if (use_render_api or model is not None) and st.button("🚀 Run Lesion Segmentation Model", type="primary", use_container_width=True):
+                remote_response = None
+                try:
+                    with st.spinner("Running retinal-image inference..."):
+                        if use_render_api:
+                            remote_response = render_predict(temp_image_path)
+                            if "results" in remote_response:
+                                idrid = remote_response["results"].get("idrid", {})
+                                if idrid.get("status") != "success":
+                                    raise RuntimeError(idrid.get("message", "IDRiD inference is unavailable."))
+                                res = {"lesion_stats": idrid["result"]["lesions"]}
+                            else:
+                                res = {"lesion_stats": remote_response["result"]["lesions"]}
+                        else:
+                            img_size = model_args.get("img_size", 256) if model_args else 256
+                            res = predict_single_image(model, temp_image_path, device, img_size=(img_size, img_size), threshold=threshold, use_clahe=use_clahe)
+                except RuntimeError as error:
+                    st.error(f"Inference failed: {error}")
+                    st.stop()
 
                 st.success("✅ Segmentation Complete!")
+
+                if remote_response and "results" in remote_response:
+                    aptos = remote_response["results"].get("aptos", {})
+                    if aptos.get("status") == "success":
+                        prediction = aptos.get("result", {}).get("prediction")
+                        if prediction:
+                            st.info(f"APTOS severity: **{prediction['predicted_label']}** ({prediction['confidence']}% confidence)")
+                    drive = remote_response["results"].get("drive", {})
+                    if drive.get("status") == "unavailable":
+                        st.caption(f"DRIVE: {drive.get('message')}")
 
                 # Results Layout
                 res_col1, res_col2 = st.columns([1.2, 1])
 
                 with res_col1:
                     st.subheader("🎯 Color-Coded Multi-Lesion Segmentation Overlay")
-                    st.image(res["overlay_orig"], use_container_width=True)
+                    if use_render_api:
+                        st.image(orig_rgb, use_container_width=True, caption="The deployed API returns lesion metrics; overlay export is available in local mode.")
+                    else:
+                        st.image(res["overlay_orig"], use_container_width=True)
 
                     st.markdown("""
                     **Color Legend:**
@@ -195,15 +230,16 @@ def main():
                         st.success("💚 **No Diabetic Retinopathy Lesions Detected**: Retina background is within normal parameters.")
 
                 # Class Specific Masks
-                st.markdown("---")
-                st.subheader("🔍 Individual Lesion Mask Inspection")
-                mask_cols = st.columns(4)
+                if not use_render_api:
+                    st.markdown("---")
+                    st.subheader("🔍 Individual Lesion Mask Inspection")
+                    mask_cols = st.columns(4)
 
-                for idx, code in enumerate(LESION_TYPES):
-                    with mask_cols[idx]:
-                        m_binary = res["binary_masks_orig"][idx] * 255
-                        st.image(m_binary, use_container_width=True, caption=LESION_NAMES_FULL[code])
-                        st.caption(f"Pixels: {res['lesion_stats'][code]['pixel_count']}")
+                    for idx, code in enumerate(LESION_TYPES):
+                        with mask_cols[idx]:
+                            m_binary = res["binary_masks_orig"][idx] * 255
+                            st.image(m_binary, use_container_width=True, caption=LESION_NAMES_FULL[code])
+                            st.caption(f"Pixels: {res['lesion_stats'][code]['pixel_count']}")
 
         else:
             st.info("👆 Please upload a fundus image or select a sample image from the left sidebar to get started.")
