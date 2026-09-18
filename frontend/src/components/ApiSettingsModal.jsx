@@ -39,7 +39,7 @@ export default function ApiSettingsModal({ isOpen, onClose }) {
         <div className="bg-slate-900 text-white p-5 flex justify-between items-center border-b border-slate-800">
           <div className="flex items-center space-x-2">
             <Server className="w-5 h-5 text-sky-400" />
-            <h3 className="font-bold text-lg">RetinaAI Deployed Microservice Settings</h3>
+            <h3 className="font-bold text-lg">Drishti Care Deployed Microservice Settings</h3>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             <X className="w-5 h-5" />

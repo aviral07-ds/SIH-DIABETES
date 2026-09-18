@@ -16,7 +16,7 @@ export default function HomePage({ setActiveTab }) {
   const faqs = [
     {
       q: "How does the system prevent false negatives in early stage (Mild NPDR)?",
-      a: "Early diabetic retinopathy often presents with isolated microaneurysms under 25 microns. Instead of typical image classification alone, RetinaAI incorporates a dedicated high-resolution lesion segmentation model with focal loss weighting to specifically localize pinpoint punctate hemorrhages and microaneurysms."
+      a: "Early diabetic retinopathy often presents with isolated microaneurysms under 25 microns. Instead of typical image classification alone, Drishti Care incorporates a dedicated high-resolution lesion segmentation model with focal loss weighting to specifically localize pinpoint punctate hemorrhages and microaneurysms."
     },
     {
       q: "What happens when a non-mydriatic camera takes a completely blurry picture?",
@@ -122,7 +122,7 @@ export default function HomePage({ setActiveTab }) {
         <div>
           <span className="text-xs font-extrabold tracking-widest text-teal-600 uppercase font-mono">The Triage Paradigm</span>
           <h2 className="text-2xl font-bold text-slate-900 mt-1">Overcoming the Referral Dilemma in Rural Camps</h2>
-          <p className="text-slate-600 text-sm mt-1">Why "Black-Box" diagnostics collapse under real-world clinical scrutiny, and how RetinaAI's topographic contours give community medical officers confidence instantly.</p>
+          <p className="text-slate-600 text-sm mt-1">Why "Black-Box" diagnostics collapse under real-world clinical scrutiny, and how Drishti Care's topographic contours give community medical officers confidence instantly.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -165,7 +165,7 @@ export default function HomePage({ setActiveTab }) {
             <div className="flex justify-between items-center">
               <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                <span>RetinaAI Topographic Explainability</span>
+                <span>Drishti Care Topographic Explainability</span>
               </span>
               <span className="text-xs text-emerald-700 font-medium">Grad-CAM++ Neural Saliency</span>
             </div>

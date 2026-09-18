@@ -1,4 +1,4 @@
-// RetinaAI API Configuration
+// Drishti Care API Configuration
 // Easily switch between deployed Render Cloud endpoints and local development
 
 export const DEFAULT_API_CONFIG = {

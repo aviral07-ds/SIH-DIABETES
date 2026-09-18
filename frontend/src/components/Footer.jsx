@@ -12,7 +12,7 @@ export default function Footer({ setActiveTab }) {
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 text-white font-extrabold text-lg mb-3">
               <Eye className="w-5 h-5 text-sky-400" />
-              <span>RetinaAI Diagnostic Suite</span>
+              <span>Drishti Care Diagnostic Suite</span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed max-w-md">
               Point-of-care explainable artificial intelligence for early diabetic retinopathy detection, purpose-engineered for primary health centers and rural camps across India.
@@ -46,13 +46,13 @@ export default function Footer({ setActiveTab }) {
         <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/60 mb-6 flex items-start space-x-3 text-xs text-slate-300">
           <AlertCircle className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            <span className="font-semibold text-white">Clinical Disclaimer:</span> RetinaAI is an AI-assisted diagnostic screening support tool designed to facilitate rapid clinical triage. It is not an autonomous medical device and does not replace formal examination by a licensed ophthalmologist or registered retinal specialist.
+            <span className="font-semibold text-white">Clinical Disclaimer:</span> Drishti Care is an AI-assisted diagnostic screening support tool designed to facilitate rapid clinical triage. It is not an autonomous medical device and does not replace formal examination by a licensed ophthalmologist or registered retinal specialist.
           </p>
         </div>
 
         {/* Bottom Rights */}
         <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 pt-4">
-          <p>© 2026 RetinaAI India. Open Clinical Standards.</p>
+          <p>© 2026 Drishti Care India. Open Clinical Standards.</p>
           <p className="mt-2 sm:mt-0">Engineered for Edge Deployment • v2.4.0-edge</p>
         </div>
 

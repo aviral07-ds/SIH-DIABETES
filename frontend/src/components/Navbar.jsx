@@ -48,7 +48,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenApiSettings }) {
             </div>
             <div>
               <div className="flex items-center space-x-1.5">
-                <span className="font-extrabold text-xl tracking-tight text-slate-900">Retina<span className="text-sky-600">AI</span></span>
+                <span className="font-extrabold text-xl tracking-tight text-slate-900">Drishti<span className="text-sky-600">Care</span></span>
                 <span className="bg-sky-100 text-sky-800 text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">{t.clinicalTriage}</span>
               </div>
               <p className="text-[10px] text-slate-500 font-medium tracking-wider uppercase">{t.pointOfCareEngine}</p>
