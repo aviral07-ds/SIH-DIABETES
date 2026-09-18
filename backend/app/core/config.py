@@ -9,7 +9,7 @@ class Settings:
     api_key: str | None = os.getenv("API_KEY")
     max_upload_bytes: int = int(os.getenv("MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
     cors_origins: tuple[str, ...] = tuple(
-        origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()
+        origin.strip() for origin in os.getenv("CORS_ORIGINS", "https://sih-diabetes-frontend-yg0r.onrender.com,http://localhost:3000,http://localhost:5173,*").split(",") if origin.strip()
     )
 
 

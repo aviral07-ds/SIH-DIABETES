@@ -15,14 +15,13 @@ def create_model_app(model_name: str, description: str, predictor: Callable[[byt
         description=description,
         version="1.0.0",
     )
-    if settings.cors_origins:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=list(settings.cors_origins),
-            allow_credentials=False,
-            allow_methods=["POST"],
-            allow_headers=["Content-Type", "X-API-Key"],
-        )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(settings.cors_origins) if settings.cors_origins else ["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     app.include_router(create_prediction_router(model_name, predictor), prefix="/api")
 
