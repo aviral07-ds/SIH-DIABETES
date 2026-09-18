@@ -112,3 +112,5 @@ eval_results/
 
 # Log & Checkpoint cache (optional: keep best_model.pth if under 100MB, exclude checkpoints folder binary dumps if needed)
 *.log
+sample_images/
+constraints.txt
