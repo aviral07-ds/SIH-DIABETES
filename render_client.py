@@ -1,4 +1,4 @@
-"""Server-side client for the deployed SIH Diabetes FastAPI service."""
+"""Server-side client for the independently deployed model services."""
 
 import mimetypes
 import os
@@ -9,25 +9,49 @@ import requests
 
 load_dotenv()
 
-API_URL = os.getenv("RENDER_API_URL", "").rstrip("/")
-API_KEY = os.getenv("RENDER_API_KEY", "")
-API_ENDPOINT = os.getenv("RENDER_API_ENDPOINT", "/api/predict/all")
+SERVICES = {
+    "aptos": {
+        "url": os.getenv("APTOS_API_URL", "").rstrip("/"),
+        "key": os.getenv("APTOS_API_KEY", ""),
+        "endpoint": "/api/predict/aptos",
+    },
+    "idrid": {
+        "url": os.getenv("IDRID_API_URL", "").rstrip("/"),
+        "key": os.getenv("IDRID_API_KEY", ""),
+        "endpoint": "/api/predict/idrid",
+    },
+    "drive": {
+        "url": os.getenv("DRIVE_API_URL", "").rstrip("/"),
+        "key": os.getenv("DRIVE_API_KEY", ""),
+        "endpoint": "/api/predict/drive",
+    },
+}
 
 
-def is_configured() -> bool:
-    return bool(API_URL and API_KEY)
+def _service(model: str) -> dict[str, str]:
+    try:
+        return SERVICES[model.lower()]
+    except KeyError as error:
+        raise ValueError(f"Unknown model service: {model}") from error
 
 
-def predict(image_path: str) -> dict:
-    """Send one image to Render without exposing the API key to the browser."""
-    if not is_configured():
-        raise RuntimeError("Set RENDER_API_URL and RENDER_API_KEY in .env before using Render inference.")
-    endpoint = API_ENDPOINT if API_ENDPOINT.startswith("/") else f"/{API_ENDPOINT}"
+def is_configured(model: str = "idrid") -> bool:
+    """Return whether one model service has a URL and API key configured."""
+    service = _service(model)
+    return bool(service["url"] and service["key"])
+
+
+def predict(image_path: str, model: str = "idrid") -> dict:
+    """Send an image to one model service without exposing its API key."""
+    service = _service(model)
+    if not is_configured(model):
+        prefix = model.upper()
+        raise RuntimeError(f"Set {prefix}_API_URL and {prefix}_API_KEY in .env before using Render inference.")
     mime_type = mimetypes.guess_type(image_path)[0] or "application/octet-stream"
     with Path(image_path).open("rb") as image_file:
         response = requests.post(
-            f"{API_URL}{endpoint}",
-            headers={"X-API-Key": API_KEY},
+            f"{service['url']}{service['endpoint']}",
+            headers={"X-API-Key": service["key"]},
             files={"file": (Path(image_path).name, image_file, mime_type)},
             timeout=(10, 180),
         )

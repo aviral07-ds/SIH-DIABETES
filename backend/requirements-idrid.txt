@@ -1,0 +1,6 @@
+-r requirements-common.txt
+
+numpy==2.1.3
+pillow==11.2.1
+opencv-python-headless==4.11.0.86
+torch==2.5.1

@@ -1,0 +1,28 @@
+# syntax=docker/dockerfile:1
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+COPY backend/requirements-common.txt backend/requirements-drive.txt ./
+RUN pip install --no-cache-dir -r requirements-drive.txt
+
+# DRIVE is isolated now so a future checkpoint can be added without affecting APTOS or IDRiD.
+COPY backend/app/__init__.py ./app/__init__.py
+COPY backend/app/core ./app/core
+COPY backend/app/api/__init__.py backend/app/api/model_routes.py ./app/api/
+COPY backend/app/model_app.py backend/app/main_drive.py ./app/
+COPY backend/app/services/__init__.py backend/app/services/drive_service.py ./app/services/
+COPY backend/app/models/__init__.py ./app/models/__init__.py
+COPY backend/app/models/drive ./app/models/drive
+
+RUN useradd --create-home --shell /usr/sbin/nologin appuser && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:' + __import__('os').environ.get('PORT', '8000') + '/health')"
+CMD ["sh", "-c", "uvicorn app.main_drive:app --host 0.0.0.0 --port ${PORT:-8000}"]

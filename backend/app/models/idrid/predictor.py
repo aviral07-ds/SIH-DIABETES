@@ -7,9 +7,6 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image
-import torch
-
-from .model import UNet
 
 MODEL_PATH = Path(__file__).resolve().parent / "best_model.pth"
 LESION_TYPES = ("MA", "HE", "EX", "SE")
@@ -18,6 +15,8 @@ LESION_NAMES = {"MA": "Microaneurysms (MA)", "HE": "Hemorrhages (HE)", "EX": "Ha
 
 @lru_cache(maxsize=1)
 def _load_model():
+    import torch
+    from .model import UNet
     if not MODEL_PATH.is_file():
         raise RuntimeError("IDRiD model checkpoint is missing from the deployment image.")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -36,6 +35,7 @@ def _clahe(image_bgr: np.ndarray) -> np.ndarray:
 
 
 def predict(image_bytes: bytes, threshold: float = 0.5) -> dict:
+    import torch
     Image.open(BytesIO(image_bytes)).verify()
     image_bgr = cv2.imdecode(np.frombuffer(image_bytes, dtype=np.uint8), cv2.IMREAD_COLOR)
     if image_bgr is None:

@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 libgl1 libgomp1 && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements-common.txt backend/requirements-idrid.txt ./
+RUN pip install --no-cache-dir -r requirements-idrid.txt
+
+# Copy only shared API code and IDRiD assets: TensorFlow and APTOS assets are excluded.
+COPY backend/app/__init__.py ./app/__init__.py
+COPY backend/app/core ./app/core
+COPY backend/app/api/__init__.py backend/app/api/model_routes.py ./app/api/
+COPY backend/app/model_app.py backend/app/main_idrid.py ./app/
+COPY backend/app/services/__init__.py backend/app/services/idrid_service.py ./app/services/
+COPY backend/app/models/__init__.py ./app/models/__init__.py
+COPY backend/app/models/idrid ./app/models/idrid
+
+RUN useradd --create-home --shell /usr/sbin/nologin appuser && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:' + __import__('os').environ.get('PORT', '8000') + '/health')"
+CMD ["sh", "-c", "uvicorn app.main_idrid:app --host 0.0.0.0 --port ${PORT:-8000}"]

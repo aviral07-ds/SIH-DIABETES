@@ -1,30 +1,62 @@
 # syntax=docker/dockerfile:1
 # ============================================================
-# Docker Compose for local development
+# Docker Compose for the independent model services
 # ============================================================
 
 services:
-  dr-api:
+  aptos-api:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: dr-screening-api:latest
-    container_name: dr-screening-api
+      dockerfile: backend/Dockerfile.aptos
+    image: sih-diabetes-aptos:local
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
-      - PORT=8000
-      - LOG_LEVEL=INFO
-    volumes:
-      - "./aptos final/test_images:/app/test_images:ro"
-      - uploads:/app/uploads
+      PORT: 8000
+      API_KEY: ${APTOS_API_KEY}
+      CORS_ORIGINS: http://localhost:8501
     restart: unless-stopping
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 90s
 
-volumes:
-  uploads:
+  idrid-api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.idrid
+    image: sih-diabetes-idrid:local
+    ports:
+      - "8002:8000"
+    environment:
+      PORT: 8000
+      API_KEY: ${IDRID_API_KEY}
+      CORS_ORIGINS: http://localhost:8501
+    restart: unless-stopping
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  drive-api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.drive
+    image: sih-diabetes-drive:local
+    ports:
+      - "8003:8000"
+    environment:
+      PORT: 8000
+      API_KEY: ${DRIVE_API_KEY}
+      CORS_ORIGINS: http://localhost:8501
+    restart: unless-stopping
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s

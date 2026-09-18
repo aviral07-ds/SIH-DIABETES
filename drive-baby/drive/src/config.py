@@ -11,7 +11,8 @@ class TrainingConfig:
     # Data
     data_dir: str = "dataset/training"
     image_subdir: str = "images"
-    mask_subdir: str = "mask"
+    # Official DRIVE annotations are stored in ``training/1st_manual``.
+    mask_subdir: str = "1st_manual"
     image_size: Tuple[int, int] = (512, 512)
 
     # Training

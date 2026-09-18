@@ -1,9 +1,37 @@
 services:
   - type: web
-    name: sih-diabetes-api
+    name: sih-diabetes-aptos
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
+    dockerfilePath: ./backend/Dockerfile.aptos
+    dockerContext: .
     healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+  - type: web
+    name: sih-diabetes-idrid
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.idrid
+    dockerContext: .
+    healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+  - type: web
+    name: sih-diabetes-drive
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.drive
+    dockerContext: .
+    healthCheckPath: /health
+    plan: free
     envVars:
       - key: API_KEY
         sync: false

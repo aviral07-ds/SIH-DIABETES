@@ -1,1 +1,1 @@
-"""HTTP routes for the unified API."""
+"""HTTP routes shared by the independent model APIs."""

@@ -87,9 +87,12 @@ def main():
     overlay_alpha = st.sidebar.slider("Overlay Transparency (Alpha)", 0.1, 1.0, 0.55, 0.05)
     use_clahe = st.sidebar.checkbox("Apply CLAHE Enhancement", True)
 
-    use_render_api = render_api_configured()
+    use_render_api = render_api_configured("idrid")
     if use_render_api:
-        st.sidebar.success("Connected to the Render inference API")
+        st.sidebar.success("Connected to the IDRiD Render service")
+        for model_name in ("aptos", "drive"):
+            if render_api_configured(model_name):
+                st.sidebar.caption(f"{model_name.upper()} Render service configured")
     else:
         st.sidebar.info("Local model mode. Add Render credentials to `.env` to use the deployed API.")
 
@@ -149,17 +152,20 @@ def main():
 
             if (use_render_api or model is not None) and st.button("🚀 Run Lesion Segmentation Model", type="primary", use_container_width=True):
                 remote_response = None
+                remote_results = {}
+                remote_errors = {}
                 try:
                     with st.spinner("Running retinal-image inference..."):
                         if use_render_api:
-                            remote_response = render_predict(temp_image_path)
-                            if "results" in remote_response:
-                                idrid = remote_response["results"].get("idrid", {})
-                                if idrid.get("status") != "success":
-                                    raise RuntimeError(idrid.get("message", "IDRiD inference is unavailable."))
-                                res = {"lesion_stats": idrid["result"]["lesions"]}
-                            else:
-                                res = {"lesion_stats": remote_response["result"]["lesions"]}
+                            remote_response = render_predict(temp_image_path, "idrid")
+                            remote_results["idrid"] = remote_response
+                            res = {"lesion_stats": remote_response["result"]["lesions"]}
+                            for model_name in ("aptos", "drive"):
+                                if render_api_configured(model_name):
+                                    try:
+                                        remote_results[model_name] = render_predict(temp_image_path, model_name)
+                                    except RuntimeError as error:
+                                        remote_errors[model_name] = str(error)
                         else:
                             img_size = model_args.get("img_size", 256) if model_args else 256
                             res = predict_single_image(model, temp_image_path, device, img_size=(img_size, img_size), threshold=threshold, use_clahe=use_clahe)
@@ -169,15 +175,16 @@ def main():
 
                 st.success("✅ Segmentation Complete!")
 
-                if remote_response and "results" in remote_response:
-                    aptos = remote_response["results"].get("aptos", {})
-                    if aptos.get("status") == "success":
-                        prediction = aptos.get("result", {}).get("prediction")
-                        if prediction:
-                            st.info(f"APTOS severity: **{prediction['predicted_label']}** ({prediction['confidence']}% confidence)")
-                    drive = remote_response["results"].get("drive", {})
-                    if drive.get("status") == "unavailable":
-                        st.caption(f"DRIVE: {drive.get('message')}")
+                if remote_response:
+                    aptos = remote_results.get("aptos", {}).get("result", {})
+                    prediction = aptos.get("prediction")
+                    if prediction:
+                        st.info(f"APTOS severity: **{prediction['predicted_label']}** ({prediction['confidence']}% confidence)")
+                    drive = remote_results.get("drive", {}).get("result")
+                    if drive:
+                        st.caption(f"DRIVE vessel area: {drive['vessel_area_percentage']}%")
+                    for model_name, error in remote_errors.items():
+                        st.caption(f"{model_name.upper()}: {error}")
 
                 # Results Layout
                 res_col1, res_col2 = st.columns([1.2, 1])

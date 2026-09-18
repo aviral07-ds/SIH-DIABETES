@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    MPLCONFIGDIR=/tmp/matplotlib
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 libgl1 libgomp1 && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements-common.txt backend/requirements-aptos.txt ./
+RUN pip install --no-cache-dir -r requirements-aptos.txt
+
+# Copy only shared API code and APTOS assets: this image contains no PyTorch or IDRiD checkpoint.
+COPY backend/app/__init__.py ./app/__init__.py
+COPY backend/app/core ./app/core
+COPY backend/app/api/__init__.py backend/app/api/model_routes.py ./app/api/
+COPY backend/app/model_app.py backend/app/main_aptos.py ./app/
+COPY backend/app/services/__init__.py backend/app/services/aptos_service.py ./app/services/
+COPY backend/app/models/__init__.py ./app/models/__init__.py
+COPY backend/app/models/aptos ./app/models/aptos
+COPY ["aptos final/best_aptos_model.keras", "./app/models/aptos/best_aptos_model.keras"]
+COPY ["aptos final/aptos_model_config.json", "./app/models/aptos/config.json"]
+COPY ["aptos final/image_quality", "./app/models/aptos/image_quality"]
+
+RUN useradd --create-home --shell /usr/sbin/nologin appuser && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:' + __import__('os').environ.get('PORT', '8000') + '/health')"
+CMD ["sh", "-c", "uvicorn app.main_aptos:app --host 0.0.0.0 --port ${PORT:-8000}"]
