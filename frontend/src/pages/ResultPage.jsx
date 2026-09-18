@@ -3,12 +3,41 @@ import { AlertTriangle, CheckCircle, Clock, FileText, Printer, ArrowRight, Info,
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ResultPage({ data, setActiveTab }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   if (!data) return null;
 
   const handlePrint = () => {
     window.print();
   };
+
+  const drStageCode = data.metrics?.drStageCode !== undefined ? data.metrics.drStageCode : 2;
+  const isHi = language === 'hi';
+
+  const getTimeframe = (stage) => {
+    switch (stage) {
+      case 0: return isHi ? "नियमित वार्षिक जांच (12 महीने के भीतर)" : "Routine Annual Checkup (Within 12 Months)";
+      case 1: return isHi ? "अनुवर्ती जांच (6 से 12 महीने के भीतर)" : "Follow-Up Visit (Within 6 to 12 Months)";
+      case 2: return isHi ? "अनुशंसित परामर्श (3 से 4 सप्ताह के भीतर)" : "Recommended Visit (Within 3 to 4 Weeks)";
+      case 3: return isHi ? "तत्काल विशेषज्ञ रेफरल (7 से 14 दिनों के भीतर)" : "Urgent Specialist Referral (Within 7 to 14 Days)";
+      case 4: return isHi ? "तत्काल आपातकालीन रेफरल (24 से 48 घंटे के भीतर)" : "Immediate Emergency Referral (Within 24 to 48 Hours)";
+      default: return isHi ? "3 से 4 सप्ताह के भीतर अनुशंसित परामर्श" : "Recommended Visit (Within 3 to 4 Weeks)";
+    }
+  };
+
+  const getConsultMsg = (stage) => {
+    if (data.recommendations?.referral && !isHi) return data.recommendations.referral;
+    switch (stage) {
+      case 0: return isHi ? "डायबिटिक रेटिनोपैथी के कोई लक्षण नहीं मिले। अपने नजदीकी स्वास्थ्य केंद्र में वार्षिक नेत्र जांच जारी रखें।" : "No active signs of diabetic retinopathy detected. Continue routine annual diabetic eye screening at your local health center.";
+      case 1: return isHi ? "हल्के सूक्ष्म संवहनी परिवर्तन पाए गए। कृपया रक्त शर्करा नियंत्रण बनाए रखें और 6-12 महीनों में अनुवर्ती जांच कराएं।" : "Mild microvascular changes detected. Maintain strict blood sugar control and schedule a follow-up eye exam within 6 to 12 months.";
+      case 2: return isHi ? "मध्यम डायबिटिक रेटिनोपैथी देखी गई। कृपया विस्तृत आंख की जांच और बायोमाइक्रोस्कोपी के लिए 3 से 4 सप्ताह के भीतर नेत्र रोग विशेषज्ञ से परामर्श लें।" : "Moderate non-proliferative changes observed. Please consult a qualified eye-care professional or ophthalmologist within 3 to 4 weeks.";
+      case 3: return isHi ? "गंभीर संवहनी क्षति पाई गई। मैकुलर ओसीटी और विशेषज्ञ परामर्श के लिए 7 से 14 दिनों के भीतर तत्काल रेफरल आवश्यक है।" : "Severe microvascular compromise detected. Urgent referral for dilated biomicroscopy and Macular SD-OCT within 7 to 14 days.";
+      case 4: return isHi ? "प्रोलिफेरेटिव डायबिटिक रेटिनोपैथी पाई गई। लेजर या एंटी-वीईजीएफ उपचार के लिए 24-48 घंटों के भीतर तत्काल आपातकालीन विशेषज्ञ मूल्यांकन आवश्यक है।" : "Proliferative diabetic retinopathy (PDR) detected. Immediate emergency specialist evaluation required for anti-VEGF or laser treatment within 24 to 48 hours.";
+      default: return t.consultDoctorMsg;
+    }
+  };
+
+  const targetTimeframeText = getTimeframe(drStageCode);
+  const consultAdviceText = getConsultMsg(drStageCode);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -138,7 +167,7 @@ export default function ResultPage({ data, setActiveTab }) {
             </div>
 
             <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-200 text-xs text-slate-800 leading-relaxed font-medium">
-              {t.consultDoctorMsg}
+              {consultAdviceText}
             </div>
 
             {/* Timeframe Card */}
@@ -146,7 +175,7 @@ export default function ResultPage({ data, setActiveTab }) {
               <Clock className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 <p className="text-[10px] font-bold text-amber-800 uppercase tracking-wider">{t.targetTimeframeTag}</p>
-                <p className="font-bold text-amber-950 text-sm mt-0.5">{t.targetTimeframeMsg}</p>
+                <p className="font-bold text-amber-950 text-sm mt-0.5">{targetTimeframeText}</p>
               </div>
             </div>
 

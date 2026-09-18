@@ -232,9 +232,24 @@ export const analyzeRetinaImage = async (imageFile, patientInfo = {}) => {
         : "Foveal avascular zone (FAZ) is clear. Regular annual screening recommended."
     },
     recommendations: {
-      referral: drStageCode >= 3 
-        ? "Urgent referral for dilated slit-lamp biomicroscopy and Macular SD-OCT within 7-14 Days."
-        : (drStageCode >= 2 ? "Referral for dilated slit-lamp biomicroscopy within 30 Days." : "Routine annual diabetic eye screening."),
+      referral: drStageCode >= 4
+        ? "Immediate emergency referral for anti-VEGF or pan-retinal photocoagulation within 24-48 Hours."
+        : (drStageCode >= 3 
+            ? "Urgent referral for dilated slit-lamp biomicroscopy and Macular SD-OCT within 7-14 Days."
+            : (drStageCode >= 2 
+                ? "Referral for dilated slit-lamp biomicroscopy within 30 Days (3-4 Weeks)."
+                : (drStageCode === 1 
+                    ? "Follow-up eye examination within 6-12 Months." 
+                    : "Routine annual diabetic eye screening at nearest primary health center."))),
+      targetTimeframe: drStageCode >= 4
+        ? "Immediate Emergency Referral (Within 24 to 48 Hours)"
+        : (drStageCode >= 3
+            ? "Urgent Specialist Referral (Within 7 to 14 Days)"
+            : (drStageCode >= 2
+                ? "Recommended Visit (Within 3 to 4 Weeks)"
+                : (drStageCode === 1
+                    ? "Follow-Up Visit (Within 6 to 12 Months)"
+                    : "Routine Annual Checkup (Within 12 Months)"))),
       metabolic: "Internal Medicine/Endocrinology consultation for glycemic and blood pressure titration. Target HbA1c threshold < 7.0%."
     },
     doctor: {
