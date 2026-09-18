@@ -1,5 +1,20 @@
 services:
   - type: web
+    name: sih-diabetes-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: VITE_IDRID_API_URL
+        value: https://sih-diabetes-idrid.onrender.com
+      - key: VITE_APTOS_API_URL
+        value: https://sih-diabetes-aptos.onrender.com
+      - key: VITE_DRIVE_API_URL
+        value: https://sih-diabetes-drive.onrender.com
+
+  - type: web
     name: sih-diabetes-aptos
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.aptos
