@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { 
   Compass, Eye, Star, MapPin, Phone, Navigation, Loader2, 
   AlertCircle, RefreshCw, Building2, ExternalLink, ShieldCheck, 
-  Clock, Search, CheckCircle2 
+  Clock, Search, CheckCircle2, Edit3 
 } from 'lucide-react';
 import { getStoredApiConfig } from '../config/api';
 import { useLanguage } from '../context/LanguageContext';
 import { NEARBY_HOSPITALS, getLiveMapsSearchUrl } from '../services/nearbyHospitals';
 
-export default function NearbySpecialists({ onOpenDirectory }) {
+export default function NearbySpecialists({ initialLocation, onOpenDirectory }) {
   const { language } = useLanguage();
   const isHi = language === 'hi';
 
+  const defaultLoc = initialLocation || 'PHC Shirwal, Satara District';
+  const [locationQuery, setLocationQuery] = useState(defaultLoc);
+  const [isEditingLoc, setIsEditingLoc] = useState(false);
   const [status, setStatus] = useState('ready'); // 'ready' | 'locating' | 'fetching' | 'success' | 'fallback'
   const [errorMessage, setErrorMessage] = useState('');
   const [activeDistrict, setActiveDistrict] = useState('All');
@@ -30,6 +33,14 @@ export default function NearbySpecialists({ onOpenDirectory }) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return Math.round(R * c * 10) / 10;
   };
+
+  // Synchronize when initialLocation prop changes
+  useEffect(() => {
+    if (initialLocation) {
+      setLocationQuery(initialLocation);
+      applyLocationFilter(initialLocation);
+    }
+  }, [initialLocation]);
 
   // Initialize with curated accredited centers
   useEffect(() => {
@@ -50,7 +61,31 @@ export default function NearbySpecialists({ onOpenDirectory }) {
       source: 'Curated Registry'
     }));
     setSpecialists(initialList);
+
+    if (defaultLoc) {
+      applyLocationFilter(defaultLoc);
+    }
   }, []);
+
+  // When location input changes, auto-adjust district filter if matched
+  const applyLocationFilter = (locText) => {
+    const lower = (locText || '').toLowerCase();
+    if (lower.includes('satara') || lower.includes('shirwal')) {
+      setActiveDistrict('Satara');
+    } else if (lower.includes('pune')) {
+      setActiveDistrict('Pune');
+    } else if (lower.includes('mumbai') || lower.includes('thane') || lower.includes('byculla')) {
+      setActiveDistrict('Mumbai');
+    } else if (lower.includes('delhi') || lower.includes('aiims')) {
+      setActiveDistrict('All');
+    }
+  };
+
+  const handleLocationChange = (val) => {
+    setLocationQuery(val);
+    setUserCoords(null); // Switching back to manual text location
+    applyLocationFilter(val);
+  };
 
   const handleFindSpecialists = () => {
     if (!navigator.geolocation) {
@@ -66,6 +101,7 @@ export default function NearbySpecialists({ onOpenDirectory }) {
       async (position) => {
         const { latitude, longitude } = position.coords;
         setUserCoords({ latitude, longitude });
+        setLocationQuery(isHi ? `लाइव जीपीएस (${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°)` : `Live GPS (${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°)`);
         setStatus('fetching');
 
         try {
@@ -94,7 +130,6 @@ export default function NearbySpecialists({ onOpenDirectory }) {
             })));
             setStatus('success');
           } else {
-            // Local fallback with recalculated GPS distances
             applyGpsFallback(latitude, longitude);
           }
         } catch (err) {
@@ -120,7 +155,6 @@ export default function NearbySpecialists({ onOpenDirectory }) {
 
   const applyGpsFallback = (lat, lng) => {
     const updated = NEARBY_HOSPITALS.map(h => {
-      // Approximate hospital coordinates based on district
       let hLat = 17.6805, hLng = 74.0183;
       if (h.district === 'Pune') { hLat = 18.5204; hLng = 73.8567; }
       else if (h.district === 'Mumbai') { hLat = 18.9634; hLng = 72.8339; }
@@ -148,6 +182,15 @@ export default function NearbySpecialists({ onOpenDirectory }) {
     updated.sort((a, b) => (a.distance_km || 9999) - (b.distance_km || 9999));
     setSpecialists(updated);
     setStatus('success');
+  };
+
+  // Build live Google Maps search URL based on current coordinates or typed text location
+  const getDynamicMapsUrl = () => {
+    if (userCoords) {
+      return getLiveMapsSearchUrl(userCoords);
+    }
+    const query = locationQuery ? `eye specialist ophthalmologist retina hospital in ${locationQuery}` : 'eye specialist ophthalmologist retina hospital near me';
+    return `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
   };
 
   // Filter specialists by district / PMJAY
@@ -186,7 +229,7 @@ export default function NearbySpecialists({ onOpenDirectory }) {
 
         {/* Live Google Maps Quick Link */}
         <a
-          href={getLiveMapsSearchUrl(userCoords)}
+          href={getDynamicMapsUrl()}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center space-x-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition-all shrink-0"
@@ -203,34 +246,52 @@ export default function NearbySpecialists({ onOpenDirectory }) {
           : 'Connect with nearby accredited ophthalmologists, government district eye OPDs, and Ayushman Bharat (PMJAY) vitreo-retinal centers.'}
       </p>
 
-      {/* GPS Location Bar & Status */}
-      <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white/80 dark:bg-slate-800/80 rounded-2xl border border-sky-100 dark:border-slate-700">
-        <div className="flex items-center space-x-2 text-xs text-slate-600 dark:text-slate-300">
-          <MapPin className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
-          <span>
-            {status === 'locating' && (isHi ? 'जीपीएस स्थान प्राप्त किया जा रहा है...' : 'Detecting your GPS location...')}
-            {status === 'fetching' && (isHi ? 'निकटतम नेत्र क्लीनिक खोजे जा रहे हैं...' : 'Querying nearby eye specialists...')}
-            {(status === 'ready' || status === 'fallback') && (
-              isHi ? 'महाराष्ट्र व राष्ट्रीय नेत्र केंद्रों की सूची प्रदर्शित है' : 'Showing accredited district referral centers'
-            )}
-            {status === 'success' && (
-              isHi ? 'आपके जीपीएस स्थान के अनुसार निकटतम केंद्र' : 'Sorted by distance from your current location'
-            )}
+      {/* User Input Center / Location Bar */}
+      <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl border-2 border-sky-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <div className="flex items-center space-x-2 flex-1">
+          <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
+          <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-200 shrink-0">
+            {isHi ? 'स्क्रीनिंग केंद्र / शहर:' : 'Center / Location:'}
           </span>
+          <input
+            type="text"
+            value={locationQuery}
+            onChange={(e) => handleLocationChange(e.target.value)}
+            placeholder={isHi ? 'उदा. Satara, Pune, Mumbai, या अपना शहर' : 'e.g. Satara, Pune, Mumbai, or your city'}
+            className="flex-1 bg-sky-50/50 dark:bg-slate-900/60 text-xs font-bold text-sky-900 dark:text-sky-200 px-3 py-1.5 rounded-xl border border-sky-100 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          />
         </div>
 
         <button
           onClick={handleFindSpecialists}
           disabled={status === 'locating' || status === 'fetching'}
-          className="inline-flex items-center space-x-1.5 text-xs font-bold text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-white bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 px-3 py-1.5 rounded-lg border border-sky-200 dark:border-sky-800 transition-colors"
+          className="inline-flex items-center justify-center space-x-1.5 text-xs font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 px-3 py-1.5 rounded-xl border border-sky-200 dark:border-sky-800 transition-colors shrink-0"
         >
           {status === 'locating' || status === 'fetching' ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : (
-            <RefreshCw className="w-3.5 h-3.5" />
+            <Compass className="w-3.5 h-3.5" />
           )}
-          <span>{isHi ? 'मेरा स्थान अपडेट करें' : 'Detect My Location'}</span>
+          <span>{isHi ? 'लाइव GPS का पता लगाएं' : 'Detect Live GPS'}</span>
         </button>
+      </div>
+
+      {/* Location Status Label */}
+      <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 px-1">
+        <span>
+          {userCoords ? (
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center space-x-1">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>{isHi ? 'सक्रिय स्थान: उपयोगकर्ता का लाइव डिवाइस जीपीएस' : 'Active Location: Live Device GPS Coordinates'}</span>
+            </span>
+          ) : (
+            <span>
+              {isHi 
+                ? `सक्रिय स्थान: "${locationQuery}" (रोगी फॉर्म / इनपुट द्वारा निर्धारित)` 
+                : `Active Location: "${locationQuery}" (Set by user input / patient form)`}
+            </span>
+          )}
+        </span>
       </div>
 
       {/* Error or Notice Alert */}

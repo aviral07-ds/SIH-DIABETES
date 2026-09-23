@@ -233,7 +233,10 @@ export default function ResultPage({ data, setActiveTab }) {
           </div>
 
           {/* Nearby Eye Specialists Finder */}
-          <NearbySpecialists onOpenDirectory={() => setIsSpecialistsModalOpen(true)} />
+          <NearbySpecialists 
+            initialLocation={data?.patient?.facility} 
+            onOpenDirectory={() => setIsSpecialistsModalOpen(true)} 
+          />
 
           {/* Full Directory Modal */}
           <NearbySpecialistsModal 

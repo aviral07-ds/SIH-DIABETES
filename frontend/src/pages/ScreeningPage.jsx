@@ -257,6 +257,17 @@ export default function ScreeningPage({ onAnalysisComplete }) {
                 className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
               />
             </div>
+
+            <div className="md:col-span-2">
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">{t.facilityLocation}</label>
+              <input 
+                type="text" 
+                value={patient.facility}
+                placeholder="e.g. PHC Shirwal, Satara District or Pune, Maharashtra"
+                onChange={(e) => setPatient({...patient, facility: e.target.value})}
+                className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-800">
