@@ -146,8 +146,8 @@ export default function ReportPage({ data }) {
             </div>
             <div>
               <p className="text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">PRIMARY AI-ASSISTED FINDING</p>
-              <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">{data.metrics.drStageTitle} <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">[ICD-10: E11.319 • ICDR Stage 2]</span></h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-snug">Non-Proliferative Diabetic Retinopathy detected with high clinical confidence. Foveal avascular margin exhibits micro-vascular compromise.</p>
+              <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">{data.metrics.drStageTitle} <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">[ICD-10: {data.metrics.icd10} • {data.metrics.icdrStage}]</span></h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-snug">{data.reportFindingSummary || "Foveal avascular margin evaluated with deep neural optical models."}</p>
             </div>
           </div>
 

@@ -39,9 +39,15 @@ export default function AnalysisPage({ data, setActiveTab }) {
               <span className="text-[10px] font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider">CHANNEL 1</span>
               <h3 className="font-extrabold text-slate-900 dark:text-white text-base">Lesion Localization Channel</h3>
             </div>
-            <span className="bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 text-xs font-bold px-2.5 py-1 rounded-full">
-              34 Micro-Foci Marked
-            </span>
+            {data.totalFociCount > 0 ? (
+              <span className="bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 text-xs font-bold px-2.5 py-1 rounded-full">
+                {data.totalFociCount} Micro-Foci Marked
+              </span>
+            ) : (
+              <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold px-2.5 py-1 rounded-full">
+                0 Lesions Detected (Clear)
+              </span>
+            )}
           </div>
 
           <div className="relative rounded-2xl overflow-hidden bg-slate-950 aspect-square flex items-center justify-center group border border-slate-800">
@@ -58,17 +64,26 @@ export default function AnalysisPage({ data, setActiveTab }) {
               <span>Optical Scan OD - Annotated Bounding Regions</span>
             </div>
 
-            {/* Bounding Box Labels simulation matching Screenshot 1 */}
-            <div className="absolute top-1/3 left-1/3 border-2 border-rose-500 bg-rose-500/20 text-white text-[9px] font-extrabold px-1 rounded shadow">
-              MA: 0.94
-            </div>
-            <div className="absolute bottom-1/3 right-1/3 border-2 border-amber-400 bg-amber-400/20 text-white text-[9px] font-extrabold px-1 rounded shadow">
-              EX: 0.88
-            </div>
+            {/* Dynamic Bounding Box Labels calculated from actual model detections */}
+            {data.lesionDetections && data.lesionDetections.length > 0 ? (
+              data.lesionDetections.map((lesion, idx) => (
+                <div 
+                  key={idx}
+                  className={`absolute border-2 ${lesion.borderColor} ${lesion.bgColor} text-white text-[9px] font-extrabold px-1 rounded shadow animate-in fade-in duration-300`}
+                  style={{ top: lesion.top, left: lesion.left }}
+                >
+                  {lesion.type}: {lesion.score}
+                </div>
+              ))
+            ) : (
+              <div className="absolute top-3 right-3 bg-emerald-900/80 backdrop-blur border border-emerald-500 text-emerald-200 text-[10px] font-bold px-2 py-1 rounded-md">
+                Healthy Fundus • Clear
+              </div>
+            )}
           </div>
 
           <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-            <span className="font-semibold text-slate-900 dark:text-white">High-magnification fundus view:</span> Demonstrates clustering of microaneurysms and hard exudates in superior and inferior-temporal perimacular quadrants.
+            <span className="font-semibold text-slate-900 dark:text-white">High-magnification fundus view:</span> {data.channel1Desc || 'Demonstrates clear optical fundus scan with healthy retinal architecture.'}
           </p>
         </div>
 
@@ -80,7 +95,7 @@ export default function AnalysisPage({ data, setActiveTab }) {
               <h3 className="font-extrabold text-slate-900 dark:text-white text-base">Model Weight Distribution (Grad-CAM++)</h3>
             </div>
             <span className="bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60 text-xs font-bold px-2.5 py-1 rounded-full">
-              FAZ Distance: 1.2 mm
+              FAZ Distance: {data.fazDistanceMm || '1.2'} mm
             </span>
           </div>
 
@@ -100,7 +115,7 @@ export default function AnalysisPage({ data, setActiveTab }) {
           </div>
 
           <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-            <span className="font-semibold text-slate-900 dark:text-white">Screening attention distribution:</span> Concentrates heavily on temporal hemorrhages and foveal exudative circinates, confirming lesion significance.
+            <span className="font-semibold text-slate-900 dark:text-white">Screening attention distribution:</span> {data.channel2Desc || 'Screening attention concentrates on retinal microvascular structure.'}
           </p>
         </div>
 

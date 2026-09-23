@@ -74,12 +74,14 @@ export default function ResultPage({ data, setActiveTab }) {
                 </div>
                 <div>
                   <span className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">{t.automatedObsTag}</span>
-                  <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">{t.possibleSignsTitle}</h2>
+                  <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">
+                    {drStageCode === 0 ? (isHi ? "स्वस्थ रेटिना — सामान्य फंडस" : "Healthy Retina — Clear Fundus") : t.possibleSignsTitle}
+                  </h2>
                 </div>
               </div>
 
               <span className="bg-amber-100 dark:bg-amber-900/50 text-amber-900 dark:text-amber-200 font-extrabold text-xs px-3 py-1.5 rounded-full border border-amber-300 dark:border-amber-700">
-                {data.metrics.drStageTitle.replace("Stage 2: ", "")}
+                {data.metrics.icdrStage || data.metrics.drStageTitle}
               </span>
             </div>
 
@@ -90,7 +92,7 @@ export default function ResultPage({ data, setActiveTab }) {
                 <span className="text-sky-700 dark:text-sky-400">{t.aiConfidence}: {data.metrics.confidence}%</span>
               </div>
               
-              <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Diabetic Retinopathy: Moderate</h3>
+              <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">{data.metrics.drStageTitle}</h3>
               
               <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
                 <div className="bg-gradient-to-r from-amber-500 to-amber-600 h-full rounded-full" style={{ width: `${data.metrics.confidence}%` }}></div>
