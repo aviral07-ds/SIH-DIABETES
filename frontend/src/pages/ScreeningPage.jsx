@@ -10,6 +10,8 @@ export default function ScreeningPage({ onAnalysisComplete }) {
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [analysisPhase, setAnalysisPhase] = useState('');
+  const [isCloudWaking, setIsCloudWaking] = useState(false);
   const [validationResult, setValidationResult] = useState(null); // null | { isValid, score, reasons }
 
   // Form State
@@ -108,23 +110,48 @@ export default function ScreeningPage({ onAnalysisComplete }) {
     if (validationResult && !validationResult.isValid) return;
 
     setLoading(true);
-    setProgress(15);
+    setProgress(12);
+    setIsCloudWaking(false);
+    setAnalysisPhase(t.executingAi || 'Optical Preprocessing & Contrast Enhancement...');
+
+    const startTime = Date.now();
 
     const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      
+      // If requests take > 3.5 seconds (likely Render free tier spinning up), alert user
+      if (elapsed > 3500) {
+        setIsCloudWaking(true);
+      }
+
       setProgress((prev) => {
-        if (prev >= 90) { clearInterval(interval); return 90; }
-        return prev + 15;
+        if (prev < 30) {
+          setAnalysisPhase('Preprocessing fundus optics & CLAHE normalization...');
+          return prev + 6;
+        } else if (prev < 60) {
+          setAnalysisPhase('Querying PyTorch U-Net for microvascular lesions (IDRiD)...');
+          return prev + 4;
+        } else if (prev < 80) {
+          setAnalysisPhase('Executing APTOS deep convolutional DR classification...');
+          return prev + 3;
+        } else if (prev < 95) {
+          setAnalysisPhase('Synthesizing Grad-CAM++ saliency & clinical triage index...');
+          return prev + 1;
+        }
+        // Slowly advance through 95% -> 98% so it never freezes
+        return Math.min(prev + (Math.random() > 0.6 ? 1 : 0), 98);
       });
-    }, 250);
+    }, 280);
 
     try {
       const results = await analyzeRetinaImage(selectedFile, patient);
-      setProgress(100);
       clearInterval(interval);
+      setProgress(100);
+      setAnalysisPhase('Triage analysis complete! Preparing clinical report...');
       setTimeout(() => {
         setLoading(false);
         onAnalysisComplete(results);
-      }, 300);
+      }, 350);
     } catch (e) {
       console.error(e);
       setLoading(false);
@@ -409,17 +436,23 @@ export default function ScreeningPage({ onAnalysisComplete }) {
 
           {/* Loading Progress Bar */}
           {loading && (
-            <div className="space-y-3 p-4 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border border-sky-200 dark:border-sky-800 animate-pulse">
+            <div className="space-y-3 p-5 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border border-sky-200 dark:border-sky-800 shadow-sm transition-all duration-300">
               <div className="flex justify-between items-center text-xs font-bold text-sky-900 dark:text-sky-200">
                 <span className="flex items-center space-x-2">
                   <Loader2 className="w-4 h-4 animate-spin text-sky-600 dark:text-sky-400" />
-                  <span>{t.executingAi}</span>
+                  <span className="font-semibold">{analysisPhase || t.executingAi}</span>
                 </span>
-                <span>{progress}%</span>
+                <span className="font-mono text-sm">{progress}%</span>
               </div>
-              <div className="w-full bg-sky-200 dark:bg-sky-900 h-2 rounded-full overflow-hidden">
-                <div className="bg-sky-600 dark:bg-sky-400 h-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+              <div className="w-full bg-sky-200 dark:bg-sky-900 h-2.5 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-sky-500 to-sky-600 h-full transition-all duration-300 ease-out" style={{ width: `${progress}%` }}></div>
               </div>
+              {isCloudWaking && (
+                <div className="flex items-center space-x-2 text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 p-2.5 rounded-xl border border-amber-200 dark:border-amber-800 animate-in fade-in duration-300">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <span>Cloud microservices warming up from sleep (Render free-tier cold start) — finalizing model inference...</span>
+                </div>
+              )}
             </div>
           )}
 

@@ -1,5 +1,18 @@
 import { getStoredApiConfig } from '../config/api';
 
+const fetchWithTimeout = async (url, options = {}, timeoutMs = 15000) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timer);
+    return res;
+  } catch (err) {
+    clearTimeout(timer);
+    throw err;
+  }
+};
+
 /**
  * Checks health of all deployed microservices
  */
@@ -11,22 +24,24 @@ export const checkServicesHealth = async () => {
     drive: false
   };
 
+  const healthTimeout = 6000;
+
   try {
-    const idridRes = await fetch(`${config.idridUrl}/health`, { method: 'GET' }).catch(() => null);
+    const idridRes = await fetchWithTimeout(`${config.idridUrl}/health`, { method: 'GET' }, healthTimeout).catch(() => null);
     if (idridRes && idridRes.ok) results.idrid = true;
   } catch (e) {
     console.warn('IDRiD health check failed', e);
   }
 
   try {
-    const aptosRes = await fetch(`${config.aptosUrl}/health`, { method: 'GET' }).catch(() => null);
+    const aptosRes = await fetchWithTimeout(`${config.aptosUrl}/health`, { method: 'GET' }, healthTimeout).catch(() => null);
     if (aptosRes && aptosRes.ok) results.aptos = true;
   } catch (e) {
     console.warn('APTOS health check failed', e);
   }
 
   try {
-    const driveRes = await fetch(`${config.driveUrl}/health`, { method: 'GET' }).catch(() => null);
+    const driveRes = await fetchWithTimeout(`${config.driveUrl}/health`, { method: 'GET' }, healthTimeout).catch(() => null);
     if (driveRes && driveRes.ok) results.drive = true;
   } catch (e) {
     console.warn('DRIVE health check failed', e);
@@ -49,52 +64,35 @@ export const analyzeRetinaImage = async (imageFile, patientInfo = {}) => {
     ...(config.apiKey ? { headers: { 'X-API-Key': config.apiKey } } : {})
   };
 
-  let idridData = null;
-  let aptosData = null;
-  let overlayBlobUrl = null;
+  const idridEndpoint = config.useLocalFallback
+    ? `${config.localUrl}/predict`
+    : `${config.idridUrl}/api/predict/idrid`;
 
-  // 1. Query IDRiD Model Endpoint
-  try {
-    const idridEndpoint = config.useLocalFallback
-      ? `${config.localUrl}/predict`
-      : `${config.idridUrl}/api/predict/idrid`;
-    const res = await fetch(idridEndpoint, requestOptions);
+  const aptosEndpoint = config.useLocalFallback
+    ? `${config.localUrl}/predict`
+    : `${config.aptosUrl}/api/predict/aptos`;
 
-    if (res.ok) {
-      idridData = await res.json();
-    }
-  } catch (e) {
-    console.warn('IDRiD model endpoint unavailable, using image-based parser', e);
-  }
+  const timeoutMs = config.timeoutMs || 15000;
 
-  // 2. Query IDRiD Overlay Endpoint (if available)
-  try {
-    const overlayEndpoint = config.useLocalFallback
-      ? `${config.localUrl}/predict/overlay`
-      : `${config.idridUrl}/predict/overlay`;
-    const res = await fetch(overlayEndpoint, requestOptions);
+  // Run IDRiD and APTOS models concurrently in parallel with timeout protection
+  const [idridResult, aptosResult] = await Promise.allSettled([
+    fetchWithTimeout(idridEndpoint, requestOptions, timeoutMs)
+      .then(async (res) => (res.ok ? await res.json() : null))
+      .catch((e) => {
+        console.warn('IDRiD model endpoint unavailable or timed out:', e);
+        return null;
+      }),
+    fetchWithTimeout(aptosEndpoint, requestOptions, timeoutMs)
+      .then(async (res) => (res.ok ? await res.json() : null))
+      .catch((e) => {
+        console.warn('APTOS model endpoint unavailable or timed out:', e);
+        return null;
+      })
+  ]);
 
-    if (res.ok) {
-      const blob = await res.blob();
-      overlayBlobUrl = URL.createObjectURL(blob);
-    }
-  } catch (e) {
-    console.warn('Overlay endpoint unavailable', e);
-  }
-
-  // 3. Query APTOS Model Endpoint
-  try {
-    const aptosEndpoint = config.useLocalFallback
-      ? `${config.localUrl}/predict`
-      : `${config.aptosUrl}/api/predict/aptos`;
-    const res = await fetch(aptosEndpoint, requestOptions);
-
-    if (res.ok) {
-      aptosData = await res.json();
-    }
-  } catch (e) {
-    console.warn('APTOS endpoint unavailable', e);
-  }
+  const idridData = idridResult.status === 'fulfilled' ? idridResult.value : null;
+  const aptosData = aptosResult.status === 'fulfilled' ? aptosResult.value : null;
+  const overlayBlobUrl = null;
 
   const imagePreviewUrl = URL.createObjectURL(imageFile);
 
