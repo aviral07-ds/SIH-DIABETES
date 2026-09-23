@@ -8,6 +8,7 @@ import ResultPage from './pages/ResultPage';
 import AnalysisPage from './pages/AnalysisPage';
 import ReportPage from './pages/ReportPage';
 import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -20,8 +21,9 @@ export default function App() {
   };
 
   return (
+    <ThemeProvider>
     <LanguageProvider>
-      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
         
         {/* Top Navigation */}
         <Navbar 
@@ -72,5 +74,6 @@ export default function App() {
 
       </div>
     </LanguageProvider>
+    </ThemeProvider>
   );
 }

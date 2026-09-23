@@ -3,11 +3,11 @@ import { Shield, Eye, AlertCircle } from 'lucide-react';
 
 export default function Footer({ setActiveTab }) {
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 mt-16 text-sm">
+    <footer className="bg-slate-900 dark:bg-slate-950 text-slate-300 border-t border-slate-800 dark:border-slate-700 mt-16 text-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
         {/* Top Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-800 dark:border-slate-700">
           
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 text-white font-extrabold text-lg mb-3">
@@ -31,7 +31,7 @@ export default function Footer({ setActiveTab }) {
 
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 mb-3">Technical Validation</h4>
-            <div className="p-3 rounded-lg bg-slate-800/80 border border-slate-700 text-xs space-y-1">
+            <div className="p-3 rounded-lg bg-slate-800/80 dark:bg-slate-800/60 border border-slate-700 text-xs space-y-1">
               <p className="text-emerald-400 font-semibold flex items-center space-x-1">
                 <Shield className="w-3.5 h-3.5" />
                 <span>ICMR Validated Standards</span>

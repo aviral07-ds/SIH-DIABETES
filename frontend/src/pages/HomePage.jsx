@@ -3,7 +3,6 @@ import { PlayCircle, ShieldCheck, Zap, Server, Cpu, Activity, Award, CheckCircle
 
 export default function HomePage({ setActiveTab }) {
 
-
   const pipelineStages = [
     { num: '01', title: 'Fundus Capture', desc: 'Smartphone / desktop fundus camera attachment (45-50° FOV)', detail: 'Raw 12MP • Retina Scope' },
     { num: '02', title: 'Edge Quality Triage', desc: 'Deterministic Laplacian variance & luminance validation in <40ms', detail: 'Reject Bad Scan • <40ms' },
@@ -12,7 +11,6 @@ export default function HomePage({ setActiveTab }) {
     { num: '05', title: 'Heatmap Synthesis', desc: 'High-resolution gradient-weighted attribution mapping for micro-lesion localization', detail: 'Explainability • Pixel Saliency' },
     { num: '06', title: 'Clinician Report', desc: 'Generates ABDM compliant DICOM / PDF triage summary for MO review', detail: 'Triage Output • ABHA Ready' }
   ];
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
@@ -78,20 +76,20 @@ export default function HomePage({ setActiveTab }) {
       {/* Six-Stage Pipeline */}
       <div className="space-y-6">
         <div>
-          <span className="text-xs font-extrabold tracking-widest text-sky-600 uppercase">Modular Tele-Health Pipeline</span>
-          <h2 className="text-2xl font-bold text-slate-900 mt-1">Six-Stage Clinical Screening Pipeline</h2>
-          <p className="text-slate-600 text-sm mt-1">Fully self-contained pipeline designed for zero-connectivity health centers, progressing from raw camera capture to an exportable ABDM-ready triage report.</p>
+          <span className="text-xs font-extrabold tracking-widest text-sky-600 dark:text-sky-400 uppercase">Modular Tele-Health Pipeline</span>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">Six-Stage Clinical Screening Pipeline</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Fully self-contained pipeline designed for zero-connectivity health centers, progressing from raw camera capture to an exportable ABDM-ready triage report.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {pipelineStages.map((stage) => (
-            <div key={stage.num} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-              <div className="text-3xl font-extrabold text-slate-200 group-hover:text-sky-500 transition-colors mb-2">
+            <div key={stage.num} className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+              <div className="text-3xl font-extrabold text-slate-200 dark:text-slate-700 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors mb-2">
                 {stage.num}
               </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-1">{stage.title}</h3>
-              <p className="text-slate-500 text-xs leading-snug mb-3">{stage.desc}</p>
-              <div className="text-[10px] font-semibold text-sky-700 bg-sky-50 px-2 py-1 rounded inline-block">
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-1">{stage.title}</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-xs leading-snug mb-3">{stage.desc}</p>
+              <div className="text-[10px] font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/40 px-2 py-1 rounded inline-block">
                 {stage.detail}
               </div>
             </div>
@@ -102,35 +100,35 @@ export default function HomePage({ setActiveTab }) {
       {/* Referral Dilemma Comparison */}
       <div className="space-y-6">
         <div>
-          <span className="text-xs font-extrabold tracking-widest text-teal-600 uppercase font-mono">The Triage Paradigm</span>
-          <h2 className="text-2xl font-bold text-slate-900 mt-1">Overcoming the Referral Dilemma in Rural Camps</h2>
-          <p className="text-slate-600 text-sm mt-1">Why opaque diagnostics collapse under real-world clinical scrutiny, and how Drishti Care's topographic contours give community medical officers confidence instantly.</p>
+          <span className="text-xs font-extrabold tracking-widest text-teal-600 dark:text-teal-400 uppercase font-mono">The Triage Paradigm</span>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">Overcoming the Referral Dilemma in Rural Camps</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Why opaque diagnostics collapse under real-world clinical scrutiny, and how Drishti Care's topographic contours give community medical officers confidence instantly.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Opaque Box */}
-          <div className="bg-rose-50/70 rounded-2xl p-6 border border-rose-200/80 space-y-4">
+          <div className="bg-rose-50/70 dark:bg-rose-950/30 rounded-2xl p-6 border border-rose-200/80 dark:border-rose-800/50 space-y-4">
             <div className="flex justify-between items-center">
-              <span className="bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+              <span className="bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-300 text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-600 dark:bg-rose-400"></span>
                 <span>Conventional Opaque Screening</span>
               </span>
-              <span className="text-xs text-rose-700 font-medium">Standard Non-Explanatory Method</span>
+              <span className="text-xs text-rose-700 dark:text-rose-400 font-medium">Standard Non-Explanatory Method</span>
             </div>
 
-            <h3 className="text-lg font-bold text-slate-900">Opaque Probability Score</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Opaque Probability Score</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Generates a raw percentage probability with zero visual grounding. Clinicians are forced into an "all-or-nothing" trust gamble, leading to high referral refusal rates.
             </p>
 
-            <div className="p-4 rounded-xl bg-white border border-rose-200 text-center space-y-1">
-              <p className="text-xs text-slate-500 font-medium">Output Diagnosis:</p>
-              <p className="text-2xl font-extrabold text-rose-600">92.4% DR Detected</p>
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-800/50 text-center space-y-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Output Diagnosis:</p>
+              <p className="text-2xl font-extrabold text-rose-600 dark:text-rose-400">92.4% DR Detected</p>
               <p className="text-[11px] text-slate-400">No indication whether caused by microaneurysms, hemorrhages, or optic disc artifacts.</p>
             </div>
 
-            <ul className="text-xs text-rose-900 space-y-1.5 font-medium">
+            <ul className="text-xs text-rose-900 dark:text-rose-300 space-y-1.5 font-medium">
               <li className="flex items-center space-x-2">
                 <span className="text-rose-500 font-bold">✕</span>
                 <span>Causes patient panic without verifiable clinical evidence</span>
@@ -143,35 +141,35 @@ export default function HomePage({ setActiveTab }) {
           </div>
 
           {/* Explainable Box */}
-          <div className="bg-emerald-50/70 rounded-2xl p-6 border border-emerald-200/80 space-y-4">
+          <div className="bg-emerald-50/70 dark:bg-emerald-950/30 rounded-2xl p-6 border border-emerald-200/80 dark:border-emerald-800/50 space-y-4">
             <div className="flex justify-between items-center">
-              <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+              <span className="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
                 <span>Drishti Care Topographic Explainability</span>
               </span>
-              <span className="text-xs text-emerald-700 font-medium">Visual Saliency Mapping</span>
+              <span className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">Visual Saliency Mapping</span>
             </div>
 
-            <h3 className="text-lg font-bold text-slate-900">Saliency-Guided Microvascular Attribution</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Saliency-Guided Microvascular Attribution</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Isolates exactly why the system raised the severity flag by overlaying calibrated heatmap contours directly onto the fundus scan.
             </p>
 
-            <div className="p-4 rounded-xl bg-white border border-emerald-200 space-y-2">
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800/50 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-slate-800">Visual Localization Map</span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">High Precision (0.94)</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Visual Localization Map</span>
+                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/40 px-2 py-0.5 rounded">High Precision (0.94)</span>
               </div>
-              <p className="text-xs text-slate-600">Screening attention concentrates heavily on temporal hemorrhages and foveal exudate circinates, confirming lesion significance.</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">Screening attention concentrates heavily on temporal hemorrhages and foveal exudate circinates, confirming lesion significance.</p>
             </div>
 
-            <ul className="text-xs text-emerald-900 space-y-1.5 font-medium">
+            <ul className="text-xs text-emerald-900 dark:text-emerald-300 space-y-1.5 font-medium">
               <li className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>30-second visual audit by visiting doctor or telemedicine hub</span>
               </li>
               <li className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Pinpoints microaneurysms, hemorrhages, and exudates explicitly</span>
               </li>
             </ul>
@@ -181,7 +179,7 @@ export default function HomePage({ setActiveTab }) {
       </div>
 
       {/* Features Grid for HWCs */}
-      <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 border border-slate-800 space-y-8">
+      <div className="bg-slate-900 dark:bg-slate-800/50 text-white rounded-3xl p-8 sm:p-10 border border-slate-800 dark:border-slate-700 space-y-8">
         <div>
           <span className="text-xs font-extrabold tracking-widest text-sky-400 uppercase">Field Deployment Pillars</span>
           <h2 className="text-2xl font-bold text-white mt-1">Engineered for India's 150,000+ Ayushman Bharat Health & Wellness Centres</h2>
@@ -189,7 +187,7 @@ export default function HomePage({ setActiveTab }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
+          <div className="p-5 rounded-2xl bg-slate-800/80 dark:bg-slate-900/60 border border-slate-700/80 space-y-2">
             <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold">
               <Zap className="w-5 h-5" />
             </div>
@@ -197,7 +195,7 @@ export default function HomePage({ setActiveTab }) {
             <p className="text-xs text-slate-400">100% Edge Local Inference. In-device model execution runs directly on base laptops/mobile devices without needing cellular signal.</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
+          <div className="p-5 rounded-2xl bg-slate-800/80 dark:bg-slate-900/60 border border-slate-700/80 space-y-2">
             <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center font-bold">
               <ShieldCheck className="w-5 h-5" />
             </div>
@@ -205,7 +203,7 @@ export default function HomePage({ setActiveTab }) {
             <p className="text-xs text-slate-400">Local Ephemeral Memory. No patient retina images saved on disk without encrypted ABHA consent tokens for inter-consultation.</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
+          <div className="p-5 rounded-2xl bg-slate-800/80 dark:bg-slate-900/60 border border-slate-700/80 space-y-2">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
               <Cpu className="w-5 h-5" />
             </div>
@@ -213,7 +211,7 @@ export default function HomePage({ setActiveTab }) {
             <p className="text-xs text-slate-400">Universal Optical Normalization. Evaluates fundus photography across ₹10,000 to ₹10,00,000 hospital fundus units.</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
+          <div className="p-5 rounded-2xl bg-slate-800/80 dark:bg-slate-900/60 border border-slate-700/80 space-y-2">
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
               <Server className="w-5 h-5" />
             </div>
