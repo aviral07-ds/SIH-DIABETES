@@ -1,36 +1,18 @@
-import React, { useState } from 'react';
-import { PlayCircle, ShieldCheck, Zap, Server, ChevronDown, ChevronUp, Cpu, Activity, Award, CheckCircle, ArrowRight } from 'lucide-react';
+import React from 'react';
+import { PlayCircle, ShieldCheck, Zap, Server, Cpu, Activity, Award, CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function HomePage({ setActiveTab }) {
-  const [openFaq, setOpenFaq] = useState(null);
+
 
   const pipelineStages = [
     { num: '01', title: 'Fundus Capture', desc: 'Smartphone / desktop fundus camera attachment (45-50° FOV)', detail: 'Raw 12MP • Retina Scope' },
     { num: '02', title: 'Edge Quality Triage', desc: 'Deterministic Laplacian variance & luminance validation in <40ms', detail: 'Reject Bad Scan • <40ms' },
-    { num: '03', title: 'Anatomical Masking', desc: 'Lightweight U-Net for optic disc, macula, and vessel occlusion', detail: 'Segmentation • Dice 0.91' },
-    { num: '04', title: 'Severity Staging', desc: 'Hybrid CNN-Transformer multi-task classifier across ICDR 0 to 4', detail: 'Classification • 5 Stages' },
-    { num: '05', title: 'Grad-CAM++ Synthesis', desc: 'High-resolution gradient-weighted attribution mapping for micro-lesions', detail: 'Explainability • Pixel Saliency' },
+    { num: '03', title: 'Anatomical Masking', desc: 'Automated segmentation for optic disc, macula, and vessel architecture', detail: 'Segmentation • Dice 0.91' },
+    { num: '04', title: 'Severity Staging', desc: 'Multi-task classification across ICDR severity stages 0 to 4', detail: 'Classification • 5 Stages' },
+    { num: '05', title: 'Heatmap Synthesis', desc: 'High-resolution gradient-weighted attribution mapping for micro-lesion localization', detail: 'Explainability • Pixel Saliency' },
     { num: '06', title: 'Clinician Report', desc: 'Generates ABDM compliant DICOM / PDF triage summary for MO review', detail: 'Triage Output • ABHA Ready' }
   ];
 
-  const faqs = [
-    {
-      q: "How does the system prevent false negatives in early stage (Mild NPDR)?",
-      a: "Early diabetic retinopathy often presents with isolated microaneurysms under 25 microns. Instead of typical image classification alone, Drishti Care incorporates a dedicated high-resolution lesion segmentation model with focal loss weighting to specifically localize pinpoint punctate hemorrhages and microaneurysms."
-    },
-    {
-      q: "What happens when a non-mydriatic camera takes a completely blurry picture?",
-      a: "The Edge Quality Triage module instantly catches out-of-focus, low illumination, or anterior-segment-obstructed fundus scans prior to inference. The worker receives an immediate actionable color-coded indicator on screen to adjust illumination/alignment rather than generating false readings."
-    },
-    {
-      q: "Was the model tested on Indian ethnic retinal phenotypes?",
-      a: "Yes. Models were calibrated on Indian subcontinent datasets (IDRiD) alongside multi-continental demographics, preventing misclassification stemming from natural deeper macular pigmentation and varied incisura variations."
-    },
-    {
-      q: "How does the rural patient link their screening with government health centers?",
-      a: "Upon image completion, the offline system renders an encrypted ABDM M3-compliant JSON and printable report. When the patient reaches the District Civil Hospital, the upstream triage engine loads the exact Grad-CAM++ visual maps without requiring cloud access."
-    }
-  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
@@ -50,11 +32,11 @@ export default function HomePage({ setActiveTab }) {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-            Explainable Retinal AI Purpose—Built for India's <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">Rural Healthcare Frontier</span>
+            Automated Retinal Screening Purpose—Built for India's <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">Rural Healthcare Frontier</span>
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Bridging the 1:100,000 specialist gap with edge-first deep learning, automated image quality filtering, and transparent Grad-CAM++ visual reasoning on low-cost fundus optical devices.
+            Bridging the 1:100,000 specialist gap with edge-first automated analysis, image quality filtering, and transparent visual reasoning on low-cost fundus optical devices.
           </p>
 
           <div className="flex flex-wrap gap-4 pt-2">
@@ -69,15 +51,15 @@ export default function HomePage({ setActiveTab }) {
               onClick={() => setActiveTab('how-it-works')}
               className="bg-slate-800/90 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold px-6 py-3.5 rounded-xl transition-all text-sm"
             >
-              Explore Explainable AI Pipeline
+              Explore Screening Pipeline
             </button>
           </div>
 
           {/* Key Stat Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6 border-t border-slate-800/80">
             <div>
-              <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">End-to-End Inference</p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">1.78s <span className="text-xs font-normal text-sky-400">(Edge / GPU)</span></p>
+              <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">End-to-End Analysis</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">1.78s <span className="text-xs font-normal text-sky-400">(On Device)</span></p>
             </div>
             <div>
               <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">AUROC Clinical Accuracy</p>
@@ -97,8 +79,8 @@ export default function HomePage({ setActiveTab }) {
       <div className="space-y-6">
         <div>
           <span className="text-xs font-extrabold tracking-widest text-sky-600 uppercase">Modular Tele-Health Pipeline</span>
-          <h2 className="text-2xl font-bold text-slate-900 mt-1">Six-Stage Deterministic Inference Pipeline</h2>
-          <p className="text-slate-600 text-sm mt-1">Fully self-contained pipeline designed for zero-connectivity health centers, progressing from raw camera photons to an exportable ABDM-ready record zip.</p>
+          <h2 className="text-2xl font-bold text-slate-900 mt-1">Six-Stage Clinical Screening Pipeline</h2>
+          <p className="text-slate-600 text-sm mt-1">Fully self-contained pipeline designed for zero-connectivity health centers, progressing from raw camera capture to an exportable ABDM-ready triage report.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -122,7 +104,7 @@ export default function HomePage({ setActiveTab }) {
         <div>
           <span className="text-xs font-extrabold tracking-widest text-teal-600 uppercase font-mono">The Triage Paradigm</span>
           <h2 className="text-2xl font-bold text-slate-900 mt-1">Overcoming the Referral Dilemma in Rural Camps</h2>
-          <p className="text-slate-600 text-sm mt-1">Why "Black-Box" diagnostics collapse under real-world clinical scrutiny, and how Drishti Care's topographic contours give community medical officers confidence instantly.</p>
+          <p className="text-slate-600 text-sm mt-1">Why opaque diagnostics collapse under real-world clinical scrutiny, and how Drishti Care's topographic contours give community medical officers confidence instantly.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -132,9 +114,9 @@ export default function HomePage({ setActiveTab }) {
             <div className="flex justify-between items-center">
               <span className="bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
-                <span>Conventional Black-Box AI</span>
+                <span>Conventional Opaque Screening</span>
               </span>
-              <span className="text-xs text-rose-700 font-medium">Standard Non-Explanatory CNN</span>
+              <span className="text-xs text-rose-700 font-medium">Standard Non-Explanatory Method</span>
             </div>
 
             <h3 className="text-lg font-bold text-slate-900">Opaque Probability Score</h3>
@@ -167,12 +149,12 @@ export default function HomePage({ setActiveTab }) {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                 <span>Drishti Care Topographic Explainability</span>
               </span>
-              <span className="text-xs text-emerald-700 font-medium">Grad-CAM++ Neural Saliency</span>
+              <span className="text-xs text-emerald-700 font-medium">Visual Saliency Mapping</span>
             </div>
 
             <h3 className="text-lg font-bold text-slate-900">Saliency-Guided Microvascular Attribution</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Isolates exactly why the algorithm raised the severity flag by overlaying calibrated heatmap contours directly onto the fundus scan.
+              Isolates exactly why the system raised the severity flag by overlaying calibrated heatmap contours directly onto the fundus scan.
             </p>
 
             <div className="p-4 rounded-xl bg-white border border-emerald-200 space-y-2">
@@ -180,7 +162,7 @@ export default function HomePage({ setActiveTab }) {
                 <span className="text-xs font-bold text-slate-800">Visual Localization Map</span>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">High Precision (0.94)</span>
               </div>
-              <p className="text-xs text-slate-600">Network attention concentrates heavily on temporal hemorrhages and foveal exudate circinates, confirming lesion significance.</p>
+              <p className="text-xs text-slate-600">Screening attention concentrates heavily on temporal hemorrhages and foveal exudate circinates, confirming lesion significance.</p>
             </div>
 
             <ul className="text-xs text-emerald-900 space-y-1.5 font-medium">
@@ -241,38 +223,12 @@ export default function HomePage({ setActiveTab }) {
         </div>
       </div>
 
-      {/* Jury FAQ Section */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
-        <div>
-          <span className="text-xs font-extrabold tracking-widest text-sky-600 uppercase">Evaluation Defense Reference</span>
-          <h2 className="text-2xl font-bold text-slate-900 mt-1">Frequently Asked Jury Questions</h2>
-        </div>
-
-        <div className="space-y-4">
-          {faqs.map((faq, idx) => (
-            <div key={idx} className="border border-slate-200 rounded-xl overflow-hidden">
-              <button
-                onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                className="w-full text-left p-4 bg-slate-50 hover:bg-slate-100/80 font-bold text-slate-900 text-sm flex justify-between items-center transition-colors"
-              >
-                <span>{faq.q}</span>
-                {openFaq === idx ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
-              </button>
-              {openFaq === idx && (
-                <div className="p-4 bg-white text-xs text-slate-600 leading-relaxed border-t border-slate-200">
-                  {faq.a}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* CTA Footer */}
       <div className="bg-gradient-to-r from-sky-600 to-teal-600 rounded-2xl p-6 text-white flex flex-col sm:flex-row justify-between items-center shadow-lg">
         <div>
           <h3 className="font-extrabold text-lg">Experience the Diagnostic Engine Live</h3>
-          <p className="text-xs text-sky-100">Test sample patient fundus scans with real-time Grad-CAM++ neural feature maps.</p>
+          <p className="text-xs text-sky-100">Test sample patient fundus scans with real-time visual feature maps and automated triage reports.</p>
         </div>
         <button
           onClick={() => setActiveTab('screening')}
