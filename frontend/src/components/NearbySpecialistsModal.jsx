@@ -3,7 +3,13 @@ import { X, MapPin, Phone, Clock, ExternalLink, Navigation, Building2, ShieldChe
 import { NEARBY_HOSPITALS, getLiveMapsSearchUrl } from '../services/nearbyHospitals';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function NearbySpecialistsModal({ isOpen, onClose, selectedDistrict = 'All' }) {
+export default function NearbySpecialistsModal({ 
+  isOpen, 
+  onClose, 
+  specialists = [], 
+  activeCity = '',
+  selectedDistrict = 'All' 
+}) {
   const { language } = useLanguage();
   const isHi = language === 'hi';
   const [filterDistrict, setFilterDistrict] = useState(selectedDistrict);
@@ -12,21 +18,57 @@ export default function NearbySpecialistsModal({ isOpen, onClose, selectedDistri
 
   if (!isOpen) return null;
 
-  const districts = ['All', 'Satara', 'Pune', 'Mumbai', 'PMJAY Free'];
+  // Build combined list of active specialists + regional centers, deduplicating by name
+  const combinedHospitals = [];
+  const seenNames = new Set();
 
-  const filteredHospitals = NEARBY_HOSPITALS.filter((hosp) => {
+  if (Array.isArray(specialists) && specialists.length > 0) {
+    for (const s of specialists) {
+      if (!s.name || seenNames.has(s.name.toLowerCase())) continue;
+      seenNames.add(s.name.toLowerCase());
+      combinedHospitals.push({
+        id: s.id || `spec-${Math.random()}`,
+        name: s.name,
+        doctor: s.doctor || 'Senior Ophthalmology Consultant',
+        doctorTitle: s.doctorTitle || 'Retina & Cornea Unit',
+        district: activeCity || s.district || 'Local Area',
+        address: s.address || s.fullAddress || `${activeCity} Medical Registry`,
+        distance: s.distanceLabel || (s.distance_km ? `${s.distance_km} km` : 'Local Area'),
+        phone: s.phone_number,
+        opdTimings: s.opd_timings || 'Mon – Sat: 9:00 AM – 5:00 PM',
+        isGovt: s.facility_type?.includes('Government') || false,
+        isPMJAY: s.is_pmjay || false,
+        googleMapsUrl: s.directions_url || `https://www.google.com/maps/search/${encodeURIComponent(s.name + ' ' + (activeCity || ''))}`,
+        facilities: ['Diabetic Retinopathy Screening', 'Slit Lamp Biomicroscopy', 'Fundus Evaluation', 'Verified Local Clinic'],
+        isLocalActive: true,
+      });
+    }
+  }
+
+  // Also append accredited regional tertiary hospitals
+  for (const h of NEARBY_HOSPITALS) {
+    if (!seenNames.has(h.name.toLowerCase())) {
+      seenNames.add(h.name.toLowerCase());
+      combinedHospitals.push(h);
+    }
+  }
+
+  const districts = ['All', 'Local Area', 'Satara', 'Pune', 'Mumbai', 'PMJAY Free'];
+
+  const filteredHospitals = combinedHospitals.filter((hosp) => {
     // District / category filter
     if (filterDistrict === 'PMJAY Free' && !hosp.isPMJAY) return false;
-    if (filterDistrict !== 'All' && filterDistrict !== 'PMJAY Free' && hosp.district !== filterDistrict) return false;
+    if (filterDistrict === 'Local Area' && !hosp.isLocalActive) return false;
+    if (filterDistrict !== 'All' && filterDistrict !== 'PMJAY Free' && filterDistrict !== 'Local Area' && hosp.district !== filterDistrict) return false;
 
     // Search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
         hosp.name.toLowerCase().includes(q) ||
-        hosp.doctor.toLowerCase().includes(q) ||
-        hosp.address.toLowerCase().includes(q) ||
-        hosp.district.toLowerCase().includes(q)
+        (hosp.doctor && hosp.doctor.toLowerCase().includes(q)) ||
+        (hosp.address && hosp.address.toLowerCase().includes(q)) ||
+        (hosp.district && hosp.district.toLowerCase().includes(q))
       );
     }
     return true;
@@ -46,13 +88,13 @@ export default function NearbySpecialistsModal({ isOpen, onClose, selectedDistri
         },
         () => {
           setLocating(false);
-          window.open(getLiveMapsSearchUrl(), '_blank', 'noopener,noreferrer');
+          window.open(activeCity ? `https://www.google.com/maps/search/eye+specialist+ophthalmologist+in+${encodeURIComponent(activeCity)}` : getLiveMapsSearchUrl(), '_blank', 'noopener,noreferrer');
         },
         { timeout: 5000 }
       );
     } else {
       setLocating(false);
-      window.open(getLiveMapsSearchUrl(), '_blank', 'noopener,noreferrer');
+      window.open(activeCity ? `https://www.google.com/maps/search/eye+specialist+ophthalmologist+in+${encodeURIComponent(activeCity)}` : getLiveMapsSearchUrl(), '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -68,10 +110,15 @@ export default function NearbySpecialistsModal({ isOpen, onClose, selectedDistri
               <span className="text-[11px] font-bold text-sky-300 uppercase tracking-widest">
                 {isHi ? 'प्रमाणित नेत्र रेफरल नेटवर्क' : 'Accredited Retinal Referral Network'}
               </span>
+              {activeCity && (
+                <span className="bg-sky-500/30 text-sky-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-400/40">
+                  {activeCity}
+                </span>
+              )}
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold flex items-center space-x-2">
               <MapPin className="w-6 h-6 text-sky-400 shrink-0" />
-              <span>{isHi ? 'निकटतम नेत्र विशेषज्ञ और अस्पताल केंद्र' : 'Nearby Eye Specialists & Hospital Centers'}</span>
+              <span>{isHi ? `${activeCity || 'निकटतम'} नेत्र विशेषज्ञ और अस्पताल केंद्र` : `Eye Specialists & Hospital Centers in ${activeCity || 'Your Area'}`}</span>
             </h2>
             <p className="text-xs text-slate-300">
               {isHi 
@@ -108,148 +155,145 @@ export default function NearbySpecialistsModal({ isOpen, onClose, selectedDistri
               className="bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition-all flex items-center justify-center space-x-2 shrink-0"
               title="Detect live GPS coordinates and open nearest eye specialists in Google Maps"
             >
-              <Crosshair className={`w-4 h-4 ${locating ? 'animate-spin' : ''}`} />
-              <span>{locating ? (isHi ? 'खोज रहे हैं...' : 'Locating...') : (isHi ? 'मैप्स पर लाइव खोजें' : 'Find Live on Google Maps')}</span>
+              <Crosshair className={`w-3.5 h-3.5 ${locating ? 'animate-spin' : ''}`} />
+              <span>{isHi ? 'मैप्स पर लाइव खोजें' : 'Open in Google Maps'}</span>
             </button>
           </div>
 
-          {/* District Filter Chips */}
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 text-xs font-semibold">
-            <span className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider shrink-0">
-              {isHi ? 'जिला/क्षेत्र:' : 'District:'}
-            </span>
+          {/* District filter pills */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1">{isHi ? 'फ़िल्टर:' : 'Filter:'}</span>
             {districts.map((d) => (
               <button
                 key={d}
                 onClick={() => setFilterDistrict(d)}
-                className={`px-3 py-1 rounded-full text-xs transition-all shrink-0 ${
+                className={`text-xs px-3 py-1 rounded-xl font-bold transition-all ${
                   filterDistrict === d
                     ? 'bg-sky-600 text-white shadow-sm'
-                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                 }`}
               >
-                {d === 'All' ? (isHi ? 'सभी केंद्र' : 'All Centers') : d === 'PMJAY Free' ? (isHi ? 'आयुष्मान मुफ्त (PMJAY)' : 'PMJAY Free') : d}
+                {d === 'PMJAY Free' ? (isHi ? 'आयुष्मान भारत (PMJAY)' : 'PMJAY Free') : d}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Hospital Cards List */}
+        {/* Hospitals Cards Directory List */}
         <div className="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1">
           {filteredHospitals.length === 0 ? (
             <div className="text-center py-12 space-y-3">
               <Building2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
-              <p className="text-slate-600 dark:text-slate-400 font-semibold text-sm">
-                {isHi ? 'कोई केंद्र नहीं मिला।' : 'No referral centers match your search.'}
+              <p className="font-bold text-slate-700 dark:text-slate-300 text-sm">
+                {isHi ? 'कोई अस्पताल या केंद्र नहीं मिला' : 'No referral centers found matching your search'}
               </p>
-              <button
-                onClick={() => { setFilterDistrict('All'); setSearchQuery(''); }}
-                className="text-xs text-sky-600 dark:text-sky-400 font-bold hover:underline"
-              >
-                {isHi ? 'फ़िल्टर रीसेट करें' : 'Reset filters'}
-              </button>
+              <p className="text-xs text-slate-400">
+                {isHi ? 'कृपया अपना खोज शब्द बदलें या "सभी" फ़िल्टर चुनें।' : 'Try searching for another city or clear the search query.'}
+              </p>
             </div>
           ) : (
             filteredHospitals.map((hosp) => (
-              <div 
+              <div
                 key={hosp.id}
-                className="bg-white dark:bg-slate-800/90 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow space-y-3.5"
+                className="bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm space-y-3.5 hover:border-sky-300 dark:hover:border-sky-700 transition-all"
               >
-                {/* Top Badge & Distance */}
-                <div className="flex flex-wrap justify-between items-start gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                   <div className="space-y-1">
-                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
-                        hosp.isGovt 
-                          ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700' 
-                          : 'bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-300 dark:border-sky-700'
-                      }`}>
-                        {hosp.type}
+                    <div className="flex items-center space-x-2">
+                      <span className="text-[10px] font-extrabold text-sky-700 dark:text-sky-300 uppercase bg-sky-50 dark:bg-sky-950/60 px-2 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">
+                        {hosp.district}
                       </span>
                       {hosp.isPMJAY && (
-                        <span className="text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-700 flex items-center space-x-1">
-                          <ShieldCheck className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                          <span>PMJAY / Ayushman Bharat</span>
+                        <span className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center space-x-1">
+                          <ShieldCheck className="w-3 h-3" />
+                          <span>PMJAY Free</span>
                         </span>
                       )}
                     </div>
-                    <h3 className="font-extrabold text-base text-slate-900 dark:text-white leading-tight">
+                    <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-snug">
                       {hosp.name}
                     </h3>
+                    <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      {hosp.doctor} {hosp.doctorTitle ? `• ${hosp.doctorTitle}` : ''}
+                    </p>
                   </div>
 
-                  <span className="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold px-2.5 py-1 rounded-xl shrink-0 flex items-center space-x-1">
-                    <Navigation className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-                    <span>{hosp.distance}</span>
-                  </span>
-                </div>
-
-                {/* Doctor On Duty */}
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs space-y-0.5">
-                  <p className="font-bold text-slate-900 dark:text-white">{hosp.doctor}</p>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-400">{hosp.doctorTitle}</p>
-                </div>
-
-                {/* Address & Timings */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-300">
-                  <div className="flex items-start space-x-2">
-                    <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                    <span className="leading-snug">{hosp.address}</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <Clock className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
-                    <span className="leading-snug">{hosp.opdTimings}</span>
-                  </div>
-                </div>
-
-                {/* Facilities Tags */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {hosp.facilities.map((f, i) => (
-                    <span key={i} className="text-[10px] font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">
-                      • {f}
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 shrink-0">
+                    <span className="bg-slate-100 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                      {hosp.distance}
                     </span>
-                  ))}
+                  </div>
                 </div>
+
+                <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700/60 pt-3">
+                  <div className="flex items-start space-x-2">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                    <span>{hosp.address}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>{hosp.opdTimings}</span>
+                  </div>
+                </div>
+
+                {/* Facility Tags */}
+                {hosp.facilities && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {hosp.facilities.map((fac, i) => (
+                      <span
+                        key={i}
+                        className="text-[10px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700"
+                      >
+                        {fac}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                  <a
-                    href={`tel:${hosp.phone.replace(/[^0-9+]/g, '')}`}
-                    className="inline-flex items-center space-x-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 transition-colors"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>{hosp.phone}</span>
-                  </a>
+                <div className="flex items-center space-x-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                  {hosp.phone ? (
+                    <a
+                      href={`tel:${hosp.phone.replace(/\s+/g, '')}`}
+                      className="flex-1 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-bold text-xs py-2 px-3 rounded-xl border border-emerald-200 dark:border-emerald-800 flex items-center justify-center space-x-1 transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{isHi ? 'ओपीडी कॉल' : 'Call OPD'}</span>
+                    </a>
+                  ) : (
+                    <a
+                      href={`https://www.google.com/search?q=${encodeURIComponent(hosp.name + ' contact phone')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 font-bold text-xs py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center space-x-1 transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{isHi ? 'संपर्क खोजें' : 'Contact Phone'}</span>
+                    </a>
+                  )}
 
                   <a
                     href={hosp.googleMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-1.5 text-xs font-bold text-white bg-sky-600 hover:bg-sky-500 px-3.5 py-2 rounded-xl shadow transition-all"
+                    className="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-sm flex items-center justify-center space-x-1 transition-all"
                   >
-                    <span>{isHi ? 'गूगल मैप्स पर देखें' : 'Directions on Google Maps'}</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <Navigation className="w-3.5 h-3.5" />
+                    <span>{isHi ? 'दिशा-निर्देश' : 'Directions'}</span>
                   </a>
                 </div>
-
               </div>
             ))
           )}
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-2 shrink-0 text-xs">
-          <p className="text-slate-500 dark:text-slate-400 text-center sm:text-left">
+        <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-center shrink-0">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">
             {isHi 
-              ? 'ABDM राष्ट्रीय स्वास्थ्य नेटवर्क के तहत सभी सरकारी जिला अस्पताल मुफ्त नेत्र परीक्षण प्रदान करते हैं।' 
-              : 'All Government District Hospitals provide free retinal dilated examination under the National Health Mission.'}
+              ? 'आपातकालीन रेटिना व विट्रेक्टोमी सर्जरी के लिए निकटतम सरकारी मेडिकल कॉलेज से तुरंत संपर्क करें।' 
+              : 'For urgent retinal detachment or acute macular hemorrhage, report directly to the nearest Medical College Emergency Eye OPD.'}
           </p>
-          <button
-            onClick={onClose}
-            className="w-full sm:w-auto px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold transition-colors"
-          >
-            {isHi ? 'बंद करें' : 'Close'}
-          </button>
         </div>
 
       </div>

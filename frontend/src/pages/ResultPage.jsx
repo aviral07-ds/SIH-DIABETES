@@ -7,6 +7,8 @@ import NearbySpecialistsModal from '../components/NearbySpecialistsModal';
 export default function ResultPage({ data, setActiveTab }) {
   const { t, language } = useLanguage();
   const [isSpecialistsModalOpen, setIsSpecialistsModalOpen] = useState(false);
+  const [modalSpecialists, setModalSpecialists] = useState([]);
+  const [modalActiveCity, setModalActiveCity] = useState('');
   if (!data) return null;
 
   const handlePrint = () => {
@@ -235,13 +237,19 @@ export default function ResultPage({ data, setActiveTab }) {
           {/* Nearby Eye Specialists Finder */}
           <NearbySpecialists 
             initialLocation={data?.patient?.facility} 
-            onOpenDirectory={() => setIsSpecialistsModalOpen(true)} 
+            onOpenDirectory={(docs, cityName) => {
+              setModalSpecialists(docs || []);
+              setModalActiveCity(cityName || '');
+              setIsSpecialistsModalOpen(true);
+            }} 
           />
 
           {/* Full Directory Modal */}
           <NearbySpecialistsModal 
             isOpen={isSpecialistsModalOpen} 
             onClose={() => setIsSpecialistsModalOpen(false)} 
+            specialists={modalSpecialists}
+            activeCity={modalActiveCity}
           />
 
           {/* Bottom Disclaimer */}
@@ -253,13 +261,6 @@ export default function ResultPage({ data, setActiveTab }) {
         </div>
 
       </div>
-
-      {/* Nearby Specialists Interactive Directory Modal */}
-      <NearbySpecialistsModal 
-        isOpen={isSpecialistsModalOpen}
-        onClose={() => setIsSpecialistsModalOpen(false)}
-        selectedDistrict={data?.patient?.facility?.includes('Satara') ? 'Satara' : 'All'}
-      />
 
     </div>
   );

@@ -5,7 +5,11 @@ import {
   Clock, Search, CheckCircle2, Navigation2, Crosshair 
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { autoDetectUserLocation, searchNearbyEyeDoctors, calculateHaversineDistance } from '../services/doctorLocator';
+import { 
+  autoDetectUserLocation, 
+  searchNearbyEyeDoctors, 
+  extractCityFromFacility 
+} from '../services/doctorLocator';
 
 export default function NearbySpecialists({ initialLocation, onOpenDirectory }) {
   const { language } = useLanguage();
@@ -19,38 +23,38 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Auto-detect user's location immediately on mount
+  // Popular quick-select cities for instant testing across regions
+  const quickCities = ['Bhopal', 'Indore', 'Lucknow', 'Jaipur', 'Patna', 'Pune', 'Nagpur', 'Satara', 'Delhi'];
+
+  // Initialize location and doctors on mount or when initialLocation changes
   useEffect(() => {
-    initUserLocationAndDoctors();
+    initLocation(initialLocation);
   }, [initialLocation]);
 
-  const initUserLocationAndDoctors = async () => {
+  const initLocation = async (facilityInput) => {
     setLoading(true);
     setErrorMessage('');
 
     try {
-      let loc;
-      // If user typed a custom facility on the screening form, use that first
-      if (initialLocation && initialLocation !== 'PHC Shirwal, Satara District') {
-        loc = {
-          city: initialLocation,
-          latitude: null,
-          longitude: null,
-          source: 'Patient Form Input',
-        };
+      const extracted = extractCityFromFacility(facilityInput);
+      if (extracted) {
+        // User entered a facility/city in patient intake
+        setActiveLocationLabel(extracted);
+        setLocationInput(extracted);
+        setLocationSource('Patient Demographics Facility');
+        const docs = await searchNearbyEyeDoctors(null, null, extracted);
+        setSpecialists(docs);
       } else {
-        // Automatically detect user location using Free GPS / IP geolocation
-        loc = await autoDetectUserLocation();
+        // Automatically detect user location using GPS or IP geolocation
+        const loc = await autoDetectUserLocation();
+        setUserCoords(loc.latitude && loc.longitude ? { latitude: loc.latitude, longitude: loc.longitude } : null);
+        setActiveLocationLabel(loc.city || 'Your Area');
+        setLocationSource(loc.source);
+        setLocationInput(loc.city || '');
+
+        const docs = await searchNearbyEyeDoctors(loc.latitude, loc.longitude, loc.city);
+        setSpecialists(docs);
       }
-
-      setUserCoords(loc.latitude && loc.longitude ? { latitude: loc.latitude, longitude: loc.longitude } : null);
-      setActiveLocationLabel(loc.city || 'Your Area');
-      setLocationSource(loc.source);
-      setLocationInput(loc.city || '');
-
-      // Fetch real nearby doctors for this location
-      const docs = await searchNearbyEyeDoctors(loc.latitude, loc.longitude, loc.city);
-      setSpecialists(docs);
     } catch (err) {
       console.error('Failed to locate doctors:', err);
       setErrorMessage(isHi ? 'स्थान या डॉक्टर लोड करने में असमर्थ। कृपया नीचे अपना शहर खोजें।' : 'Could not automatically load doctors. Please enter your city below.');
@@ -74,8 +78,7 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
         const { latitude, longitude } = pos.coords;
         setUserCoords({ latitude, longitude });
 
-        // Reverse geocode to get city name
-        let detectedCity = 'Current GPS Location';
+        let detectedCity = 'Current GPS Area';
         try {
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, {
             headers: { 'User-Agent': 'DrishtiCare/1.0' }
@@ -100,54 +103,43 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
         console.warn('GPS denied or error:', err);
         setLoading(false);
         setErrorMessage(isHi 
-          ? 'जीपीएस अनुमति नहीं मिली। आप नीचे किसी भी शहर का नाम लिखकर खोज सकते हैं।' 
-          : 'GPS permission not granted. You can type any city or district below.');
+          ? 'जीपीएस अनुमति नहीं मिली। आप नीचे किसी भी शहर का नाम चुन या लिख सकते हैं।' 
+          : 'GPS permission not granted. You can type or click any city below.');
       },
       { enableHighAccuracy: true, timeout: 8000 }
     );
   };
 
-  // Search doctors when user submits a city name
-  const handleCitySearch = async (e) => {
-    e.preventDefault();
-    const city = locationInput.trim();
-    if (!city) return;
-
+  // Select a city directly
+  const handleSelectCity = async (cityName) => {
+    if (!cityName) return;
     setLoading(true);
     setErrorMessage('');
-    setActiveLocationLabel(city);
-    setLocationSource('Custom City Search');
+    setActiveLocationLabel(cityName);
+    setLocationInput(cityName);
+    setLocationSource('City Selected');
 
     try {
-      // Geocode city to get its coordinates
-      let cityLat = null, cityLon = null;
-      try {
-        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`, {
-          headers: { 'User-Agent': 'DrishtiCare/1.0' }
-        });
-        if (geoRes.ok) {
-          const geoData = await geoRes.json();
-          if (geoData.length > 0) {
-            cityLat = parseFloat(geoData[0].lat);
-            cityLon = parseFloat(geoData[0].lon);
-            setUserCoords({ latitude: cityLat, longitude: cityLon });
-          }
-        }
-      } catch (e) {
-        console.warn('City geocoding error:', e);
-      }
-
-      const docs = await searchNearbyEyeDoctors(cityLat, cityLon, city);
+      const docs = await searchNearbyEyeDoctors(null, null, cityName);
       setSpecialists(docs);
     } catch (err) {
-      console.error('Search failed:', err);
-      setErrorMessage(isHi ? 'इस शहर के लिए डॉक्टर खोजने में त्रुटि। कृपया पुनः प्रयास करें।' : 'Error searching doctors for this city. Please try again.');
+      console.error('City search failed:', err);
+      setErrorMessage(isHi ? 'इस शहर के लिए डॉक्टर खोजने में त्रुटि।' : 'Error searching doctors for this city.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Google Maps search query link for user's exact area
+  // Search doctors when user submits a city name
+  const handleCitySearch = (e) => {
+    e.preventDefault();
+    const city = locationInput.trim();
+    if (city) {
+      handleSelectCity(city);
+    }
+  };
+
+  // Google Maps search query link for user's exact active location
   const mapsSearchUrl = userCoords
     ? `https://www.google.com/maps/search/eye+specialist+ophthalmologist+retina+hospital/@${userCoords.latitude},${userCoords.longitude},13z`
     : activeLocationLabel
@@ -174,12 +166,12 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
               </span>
             </div>
             <h3 className="font-extrabold text-slate-900 dark:text-white text-lg mt-0.5">
-              {isHi ? 'आपके नजदीकी नेत्र विशेषज्ञ और अस्पताल' : 'Nearby Eye Specialists & Eye Clinics'}
+              {isHi ? 'निकटतम नेत्र विशेषज्ञ और अस्पताल' : 'Nearby Eye Specialists & Eye Clinics'}
             </h3>
           </div>
         </div>
 
-        {/* 1-Click Live Google Maps Button */}
+        {/* 1-Click Live Google Maps Button for Current City */}
         <a
           href={mapsSearchUrl}
           target="_blank"
@@ -187,15 +179,15 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
           className="inline-flex items-center justify-center space-x-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-md transition-all shrink-0"
         >
           <Navigation2 className="w-4 h-4 fill-white" />
-          <span>{isHi ? 'गूगल मैप्स पर पास के डॉक्टर देखें' : 'Open in Google Maps'}</span>
+          <span>{isHi ? `${activeLocationLabel || 'पास में'} मैप्स पर देखें` : `Open ${activeLocationLabel || 'Local'} in Google Maps`}</span>
           <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
         </a>
       </div>
 
       <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
         {isHi 
-          ? 'आपके वर्तमान स्थान के आधार पर निकटतम नेत्र क्लीनिक और रेटिना सर्जनों की लाइव सूची। आप नीचे किसी भी शहर या पिनकोड को खोज सकते हैं।' 
-          : 'Live verified eye hospitals and retina specialists detected near your location. Search any city or district below.'}
+          ? 'आपके शहर या वर्तमान जीपीएस स्थान के आधार पर प्रमाणित नेत्र क्लीनिक और रेटिना सर्जनों की लाइव सूची। नीचे किसी भी शहर पर क्लिक करें या अपना शहर लिखें।' 
+          : 'Live verified eye hospitals and retina specialists detected for your location. Click any city below or type your town to switch immediately.'}
       </p>
 
       {/* Interactive Location & City Search Bar */}
@@ -207,7 +199,7 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
               type="text"
               value={locationInput}
               onChange={(e) => setLocationInput(e.target.value)}
-              placeholder={isHi ? 'अपना शहर या जिला लिखें (उदा. Bhopal, Lucknow, Jaipur, Indore)' : 'Enter your city or district (e.g. Bhopal, Lucknow, Jaipur, Indore)'}
+              placeholder={isHi ? 'शहर या जिला दर्ज करें (उदा. Indore, Jaipur, Lucknow, Pune)' : 'Type any city or district (e.g. Indore, Jaipur, Lucknow, Pune)'}
               className="flex-1 bg-transparent text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
             />
           </div>
@@ -229,16 +221,37 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
             title="Use Device GPS"
           >
             <Crosshair className="w-3.5 h-3.5 text-rose-500" />
-            <span>{isHi ? 'लाइव GPS' : 'My GPS'}</span>
+            <span>{isHi ? 'मेरा GPS' : 'My GPS'}</span>
           </button>
         </form>
 
+        {/* Quick-Switch City Pills */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1">
+            {isHi ? 'त्वरित शहर:' : 'Quick Select:'}
+          </span>
+          {quickCities.map((city) => (
+            <button
+              key={city}
+              type="button"
+              onClick={() => handleSelectCity(city)}
+              className={`text-xs px-2.5 py-1 rounded-xl font-bold transition-all ${
+                activeLocationLabel.toLowerCase().includes(city.toLowerCase())
+                  ? 'bg-sky-600 text-white shadow-sm ring-2 ring-sky-300 dark:ring-sky-700'
+                  : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-sky-100 dark:hover:bg-slate-600'
+              }`}
+            >
+              {city}
+            </button>
+          ))}
+        </div>
+
         {/* Current Active Location Indicator */}
-        <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-700/60">
+        <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
           <div className="flex items-center space-x-1.5 font-bold text-slate-700 dark:text-slate-300">
             <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
             <span>
-              {isHi ? 'सक्रिय स्थान:' : 'Active Location:'}{' '}
+              {isHi ? 'प्रदर्शित शहर / स्थान:' : 'Current City / Location:'}{' '}
               <span className="text-sky-600 dark:text-sky-400 font-extrabold underline">{activeLocationLabel || 'Locating...'}</span>
             </span>
           </div>
@@ -251,7 +264,7 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
         </div>
       </div>
 
-      {/* Error or Notice Alert */}
+      {/* Error / Notice Alert */}
       {errorMessage && (
         <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 flex items-start space-x-2 text-xs text-amber-800 dark:text-amber-300">
           <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -264,10 +277,10 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
         <div className="py-8 flex flex-col items-center justify-center space-y-2 text-center bg-white/60 dark:bg-slate-800/60 rounded-2xl border border-sky-100 dark:border-slate-700">
           <Loader2 className="w-7 h-7 text-sky-600 animate-spin" />
           <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-            {isHi ? 'आपके आसपास के प्रमाणित नेत्र डॉक्टर खोजे जा रहे हैं...' : 'Finding nearby eye hospitals and specialists around you...'}
+            {isHi ? `${activeLocationLabel} में नेत्र क्लीनिक और डॉक्टर खोजे जा रहे हैं...` : `Finding verified eye specialists in ${activeLocationLabel}...`}
           </p>
           <p className="text-[11px] text-slate-400 dark:text-slate-500">
-            Free OpenStreetMap & Location API Query
+            Querying OpenStreetMap Healthcare Registry
           </p>
         </div>
       )}
@@ -279,7 +292,7 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
             <div className="p-6 text-center bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
               <Building2 className="w-8 h-8 mx-auto text-slate-400" />
               <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                {isHi ? 'इस क्षेत्र में कोई विशिष्ट क्लिनिक नहीं मिला' : `No eye clinics found directly in "${activeLocationLabel}"`}
+                {isHi ? `"${activeLocationLabel}" में कोई विशिष्ट क्लिनिक नहीं मिला` : `No direct clinics found in "${activeLocationLabel}"`}
               </p>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                 {isHi ? 'सीधे गूगल मैप्स पर अपने आसपास के सभी नेत्र विशेषज्ञ देखने के लिए नीचे क्लिक करें।' : 'Click below to view all ophthalmologists and eye specialists in this area on Google Maps.'}
@@ -353,7 +366,7 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
                     className="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-sm flex items-center justify-center space-x-1 transition-all"
                   >
                     <Navigation className="w-3.5 h-3.5" />
-                    <span>{isHi ? 'गूगल मैप्स दिशा' : 'Get Directions'}</span>
+                    <span>{isHi ? 'दिशा-निर्देश' : 'Get Directions'}</span>
                   </a>
                 </div>
               </div>
@@ -369,7 +382,7 @@ export default function NearbySpecialists({ initialLocation, onOpenDirectory }) 
       >
         <MapPin className="w-4 h-4 text-sky-400" />
         <span>
-          {isHi ? 'राष्ट्रीय व जिला स्तरीय प्रमाणित अस्पताल निर्देशिका देखें' : 'View Accredited Referral Hospital Directory'}
+          {isHi ? `राष्ट्रीय व जिला स्तरीय प्रमाणित अस्पताल निर्देशिका देखें` : `View Full Hospital Directory & Network`}
         </span>
       </button>
 

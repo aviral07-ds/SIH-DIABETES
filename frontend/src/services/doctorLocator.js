@@ -15,6 +15,28 @@ export const calculateHaversineDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 /**
+ * Extracts a recognizable city or district name from a facility or hospital string.
+ */
+export const extractCityFromFacility = (text) => {
+  if (!text) return '';
+  const knownCities = [
+    'Bhopal', 'Indore', 'Jabalpur', 'Gwalior', 'Ujjain',
+    'Lucknow', 'Kanpur', 'Varanasi', 'Agra', 'Prayagraj', 'Noida',
+    'Delhi', 'New Delhi', 'Jaipur', 'Jodhpur', 'Udaipur', 'Kota',
+    'Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Satara', 'Thane', 'Aurangabad',
+    'Bengaluru', 'Bangalore', 'Mysuru', 'Hyderabad', 'Chennai', 'Coimbatore',
+    'Kolkata', 'Patna', 'Ranchi', 'Ahmedabad', 'Surat', 'Vadodara',
+    'Chandigarh', 'Ludhiana', 'Amritsar', 'Dehradun', 'Shimla', 'Raipur'
+  ];
+  const lower = text.toLowerCase();
+  for (const c of knownCities) {
+    if (lower.includes(c.toLowerCase())) return c;
+  }
+  const parts = text.split(',').map(s => s.trim().replace(/district|phc|chc|hospital|clinic/gi, '').trim()).filter(Boolean);
+  return parts[parts.length - 1] || text.trim();
+};
+
+/**
  * Automatically detects the user's location.
  * First tries high-precision device GPS.
  * If GPS is denied or takes too long, seamlessly falls back to free open IP geolocation.
@@ -71,7 +93,7 @@ export const autoDetectUserLocation = async () => {
           city: ipData.city || ipData.region || 'Local Area',
           region: ipData.region,
           country: ipData.country,
-          source: 'Auto-Detected IP Location',
+          source: 'Auto-Detected Location',
         };
       }
     }
@@ -79,7 +101,7 @@ export const autoDetectUserLocation = async () => {
     console.warn('IP geolocation error:', ipError);
   }
 
-  // 3. Default fallback if completely offline
+  // 3. Fallback
   return {
     latitude: 23.2547,
     longitude: 77.4029,
@@ -94,9 +116,31 @@ export const autoDetectUserLocation = async () => {
  * Uses free OpenStreetMap Nominatim place queries.
  */
 export const searchNearbyEyeDoctors = async (latitude, longitude, cityName) => {
-  const city = cityName || 'Bhopal';
+  const city = cityName?.trim() || 'Bhopal';
   const doctorsList = [];
   const seenNames = new Set();
+
+  let curLat = latitude;
+  let curLon = longitude;
+
+  // If coordinates are not provided, geocode the city name first
+  if (!curLat || !curLon) {
+    try {
+      const geoRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`,
+        { headers: { 'User-Agent': 'DrishtiCare-DoctorLocator/1.0' } }
+      );
+      if (geoRes.ok) {
+        const geoData = await geoRes.json();
+        if (geoData.length > 0) {
+          curLat = parseFloat(geoData[0].lat);
+          curLon = parseFloat(geoData[0].lon);
+        }
+      }
+    } catch (e) {
+      console.warn('City geocoding error:', e);
+    }
+  }
 
   const searchQueries = [
     `eye hospital in ${city}`,
@@ -120,7 +164,7 @@ export const searchNearbyEyeDoctors = async (latitude, longitude, cityName) => {
 
           const pLat = parseFloat(p.lat);
           const pLon = parseFloat(p.lon);
-          const distKm = calculateHaversineDistance(latitude, longitude, pLat, pLon);
+          const distKm = curLat && curLon ? calculateHaversineDistance(curLat, curLon, pLat, pLon) : null;
 
           // Clean up address
           const addrParts = (p.display_name || '').split(',');
@@ -151,6 +195,46 @@ export const searchNearbyEyeDoctors = async (latitude, longitude, cityName) => {
     }
 
     if (doctorsList.length >= 6) break;
+  }
+
+  // If no specific eye hospitals found, fallback to general hospitals in that city
+  if (doctorsList.length === 0) {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(city)}&amenity=hospital&limit=5`;
+      const res = await fetch(url, { headers: { 'User-Agent': 'DrishtiCare-DoctorLocator/1.0' } });
+      if (res.ok) {
+        const places = await res.json();
+        for (const p of places) {
+          const rawName = p.name || p.display_name?.split(',')[0]?.trim();
+          if (!rawName || seenNames.has(rawName.toLowerCase())) continue;
+          seenNames.add(rawName.toLowerCase());
+
+          const pLat = parseFloat(p.lat);
+          const pLon = parseFloat(p.lon);
+          const distKm = curLat && curLon ? calculateHaversineDistance(curLat, curLon, pLat, pLon) : null;
+          const shortAddress = (p.display_name || '').split(',').slice(1, 4).join(',').trim();
+
+          doctorsList.push({
+            id: `doc-${p.place_id || p.osm_id}`,
+            name: `${rawName} (Eye Dept / OPD)`,
+            address: shortAddress,
+            fullAddress: p.display_name,
+            latitude: pLat,
+            longitude: pLon,
+            distance_km: distKm,
+            distanceLabel: distKm !== null ? `${distKm} km away` : `In ${city}`,
+            phone_number: null,
+            opd_timings: 'Mon – Sat: 8:30 AM – 3:30 PM (Free Walk-in)',
+            directions_url: `https://www.google.com/maps/dir/?api=1&destination=${pLat},${pLon}`,
+            google_search_url: `https://www.google.com/search?q=${encodeURIComponent(rawName + ' ' + city + ' eye department phone')}`,
+            facility_type: 'Government / District Hospital',
+            is_pmjay: true,
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('General hospital search error:', e);
+    }
   }
 
   // Sort by closest distance first
