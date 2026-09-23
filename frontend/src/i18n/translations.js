@@ -69,6 +69,14 @@ export const translations = {
     executingAi: "Executing PyTorch U-Net & Grad-CAM++ Inference...",
     analyzingImage: "Analyzing Retina Image...",
     runAiTriage: "Run Neural AI Triage & Analysis",
+    validatingImage: "Validating image quality...",
+    invalidImageTitle: "Invalid Image — Not a Retinal Fundus Scan",
+    invalidImageDesc: "Drishti Care only accepts genuine retinal fundus photographs. The uploaded image does not appear to be a fundus scan.",
+    invalidImageHint: "Please upload a macula-centred fundus photograph (JPG, PNG, or TIFF) captured with a fundus camera or slit-lamp adaptor.",
+    tryAgain: "Try a Different Image",
+    validationScore: "Image Validation Score",
+    validationPassed: "Fundus Image Validated ✓",
+    validationFailed: "Not a Retinal Image ✗",
 
     // Result Page
     step3Tag: "STEP 3 OF 3: SCREENING RESULT",
@@ -222,6 +230,14 @@ export const translations = {
     executingAi: "PyTorch U-Net और Grad-CAM++ इंफरेंस चला रहा है...",
     analyzingImage: "रेटिना छवि का विश्लेषण किया जा रहा है...",
     runAiTriage: "न्यूरल एआई ट्राइएज और विश्लेषण चलाएं",
+    validatingImage: "छवि गुणवत्ता जाँची जा रही है...",
+    invalidImageTitle: "अमान्य छवि — यह रेटिनल फंडस स्कैन नहीं है",
+    invalidImageDesc: "दृष्टि केयर केवल वास्तविक रेटिनल फंडस फ़ोटोग्राफ़ स्वीकार करता है। अपलोड की गई छवि फंडस स्कैन नहीं लगती।",
+    invalidImageHint: "कृपया फंडस कैमरे या स्लिट-लैंप से ली गई मैकुला-केंद्रित फंडस फ़ोटोग्राफ़ (JPG, PNG, या TIFF) अपलोड करें।",
+    tryAgain: "दूसरी छवि आज़माएं",
+    validationScore: "छवि सत्यापन स्कोर",
+    validationPassed: "फंडस छवि सत्यापित ✓",
+    validationFailed: "रेटिनल छवि नहीं है ✗",
 
     // Result Page
     step3Tag: "चरण 3 का 3: स्क्रीनिंग परिणाम",

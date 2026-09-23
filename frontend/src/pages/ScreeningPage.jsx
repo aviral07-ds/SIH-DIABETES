@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { Upload, FileImage, User, Eye, Sparkles, AlertCircle, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
+import { Upload, FileImage, User, Eye, Sparkles, AlertCircle, ArrowRight, Loader2, CheckCircle2, XCircle, ShieldAlert } from 'lucide-react';
 import { analyzeRetinaImage } from '../services/apiService';
+import { validateFundusImage } from '../services/imageValidator';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ScreeningPage({ onAnalysisComplete }) {
   const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [validating, setValidating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [validationResult, setValidationResult] = useState(null); // null | { isValid, score, reasons }
 
   // Form State
   const [patient, setPatient] = useState({
@@ -30,12 +33,28 @@ export default function ScreeningPage({ onAnalysisComplete }) {
     { id: 'sample3', label: 'Sample 3: Normal Healthy Retina', desc: 'Clear Fundus' }
   ];
 
+  const applyFile = async (file, skipValidation = false) => {
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setValidationResult(null);
+
+    if (!skipValidation) {
+      setValidating(true);
+      try {
+        const result = await validateFundusImage(file);
+        setValidationResult(result);
+      } catch (err) {
+        console.warn('Validation error', err);
+        setValidationResult({ isValid: false, score: 0, reasons: ['Could not validate image. Please try a different file.'] });
+      } finally {
+        setValidating(false);
+      }
+    }
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
+    if (file) applyFile(file);
   };
 
   const handleSelectSample = async (sample) => {
@@ -78,23 +97,22 @@ export default function ScreeningPage({ onAnalysisComplete }) {
 
     canvas.toBlob((blob) => {
       const file = new File([blob], `${sample.id}.jpg`, { type: 'image/jpeg' });
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      // Sample images are synthetic fundus — skip validation to avoid false negatives
+      applyFile(file, true);
+      setValidationResult({ isValid: true, score: 100, reasons: [] });
     }, 'image/jpeg');
   };
 
   const handleRunAnalysis = async () => {
     if (!selectedFile) return;
+    if (validationResult && !validationResult.isValid) return;
 
     setLoading(true);
     setProgress(15);
 
     const interval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(interval);
-          return 90;
-        }
+        if (prev >= 90) { clearInterval(interval); return 90; }
         return prev + 15;
       });
     }, 250);
@@ -103,19 +121,19 @@ export default function ScreeningPage({ onAnalysisComplete }) {
       const results = await analyzeRetinaImage(selectedFile, patient);
       setProgress(100);
       clearInterval(interval);
-
-      // Transition to results cleanly without confetti
       setTimeout(() => {
         setLoading(false);
         onAnalysisComplete(results);
       }, 300);
-
     } catch (e) {
       console.error(e);
       setLoading(false);
       clearInterval(interval);
     }
   };
+
+  const isReadyToRun = selectedFile && !loading && !validating && validationResult?.isValid;
+
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
@@ -249,23 +267,60 @@ export default function ScreeningPage({ onAnalysisComplete }) {
           </div>
 
           {/* Upload Dropzone */}
-          <div className="border-2 border-dashed border-slate-300 hover:border-sky-500 rounded-2xl p-8 text-center bg-slate-50 hover:bg-sky-50/40 transition-all cursor-pointer relative group">
-            <input 
-              type="file" 
-              accept="image/*"
+          <div className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer relative group ${
+            validationResult?.isValid === true ? 'border-emerald-400 bg-emerald-50/40 hover:border-emerald-500' :
+            validationResult?.isValid === false ? 'border-rose-400 bg-rose-50/40' :
+            'border-slate-300 hover:border-sky-500 bg-slate-50 hover:bg-sky-50/40'
+          }`}>
+            <input
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/tiff,image/tif,image/bmp"
               onChange={handleFileChange}
               className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
             />
-            
+
             {previewUrl ? (
               <div className="space-y-4">
-                <img src={previewUrl} alt="Fundus preview" className="w-48 h-48 mx-auto object-cover rounded-2xl shadow-md border-2 border-sky-500" />
+                <div className="relative inline-block">
+                  <img src={previewUrl} alt="Fundus preview" className={`w-48 h-48 mx-auto object-cover rounded-2xl shadow-md border-2 ${
+                    validationResult?.isValid === true ? 'border-emerald-400' :
+                    validationResult?.isValid === false ? 'border-rose-400' :
+                    'border-sky-500'
+                  }`} />
+                  {validationResult?.isValid === true && (
+                    <span className="absolute -top-2 -right-2 bg-emerald-500 text-white rounded-full p-1 shadow">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </span>
+                  )}
+                  {validationResult?.isValid === false && (
+                    <span className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow">
+                      <XCircle className="w-4 h-4" />
+                    </span>
+                  )}
+                </div>
                 <div>
                   <p className="font-bold text-slate-900 text-sm">{selectedFile?.name}</p>
-                  <p className="text-xs text-emerald-600 font-semibold flex items-center justify-center space-x-1 mt-1">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>{t.imageLoaded}</span>
-                  </p>
+                  {validating ? (
+                    <p className="text-xs text-sky-600 font-semibold flex items-center justify-center space-x-1 mt-1">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>{t.validatingImage}</span>
+                    </p>
+                  ) : validationResult?.isValid === true ? (
+                    <p className="text-xs text-emerald-600 font-semibold flex items-center justify-center space-x-1 mt-1">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>{t.validationPassed} — Score: {validationResult.score}/100</span>
+                    </p>
+                  ) : validationResult?.isValid === false ? (
+                    <p className="text-xs text-rose-600 font-semibold flex items-center justify-center space-x-1 mt-1">
+                      <XCircle className="w-4 h-4" />
+                      <span>{t.validationFailed} — Score: {validationResult.score}/100</span>
+                    </p>
+                  ) : (
+                    <p className="text-xs text-emerald-600 font-semibold flex items-center justify-center space-x-1 mt-1">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>{t.imageLoaded}</span>
+                    </p>
+                  )}
                 </div>
               </div>
             ) : (
@@ -280,6 +335,61 @@ export default function ScreeningPage({ onAnalysisComplete }) {
               </div>
             )}
           </div>
+
+          {/* Validation Failure Error Card */}
+          {validationResult && !validationResult.isValid && (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5 space-y-4">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-extrabold text-rose-800 text-sm">{t.invalidImageTitle}</p>
+                  <p className="text-xs text-rose-700 mt-1 leading-relaxed">{t.invalidImageDesc}</p>
+                </div>
+              </div>
+
+              {/* Reason list */}
+              {validationResult.reasons.length > 0 && (
+                <ul className="space-y-1 pl-2">
+                  {validationResult.reasons.map((reason, i) => (
+                    <li key={i} className="flex items-start space-x-2 text-xs text-rose-700">
+                      <span className="text-rose-500 font-bold mt-0.5">✕</span>
+                      <span>{reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* Hint box */}
+              <div className="bg-white border border-rose-100 rounded-xl p-3 flex items-start space-x-2 text-xs text-slate-600">
+                <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <span>{t.invalidImageHint}</span>
+              </div>
+
+              {/* Try again prompt */}
+              <p className="text-xs text-center text-slate-500 font-medium">
+                {t.tryAgain} — <span className="text-sky-600 font-semibold">Click above or pick a sample scan below</span>
+              </p>
+            </div>
+          )}
+
+          {/* Validation Success Badge */}
+          {validationResult?.isValid && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-bold text-emerald-800 text-sm">{t.validationPassed}</p>
+                <p className="text-xs text-emerald-600">Fundus image quality verified. AI analysis is ready to run.</p>
+              </div>
+              <div className="ml-auto text-right">
+                <p className="text-xs text-emerald-500 font-semibold">{t.validationScore}</p>
+                <p className="font-extrabold text-emerald-700 text-lg">{validationResult.score}<span className="text-xs">/100</span></p>
+              </div>
+            </div>
+          )}
 
           {/* Sample Fundus Quick Picker */}
           <div className="space-y-3 pt-2">
@@ -314,13 +424,21 @@ export default function ScreeningPage({ onAnalysisComplete }) {
             </div>
           )}
 
+          {/* Validating Spinner */}
+          {validating && (
+            <div className="flex items-center space-x-3 p-4 bg-sky-50 rounded-2xl border border-sky-200 text-xs font-semibold text-sky-800">
+              <Loader2 className="w-5 h-5 animate-spin text-sky-600 shrink-0" />
+              <span>{t.validatingImage} — Running retinal image quality checks...</span>
+            </div>
+          )}
+
           {/* Submit Action CTA */}
           <div className="flex justify-end pt-4 border-t border-slate-200">
             <button
               onClick={handleRunAnalysis}
-              disabled={!selectedFile || loading}
+              disabled={!isReadyToRun}
               className={`font-bold px-8 py-4 rounded-xl text-white transition-all flex items-center space-x-2 text-sm shadow-lg ${
-                selectedFile && !loading
+                isReadyToRun
                   ? 'bg-sky-600 hover:bg-sky-700 hover:shadow-sky-500/25'
                   : 'bg-slate-300 cursor-not-allowed'
               }`}
