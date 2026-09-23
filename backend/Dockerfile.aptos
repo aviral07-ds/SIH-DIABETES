@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r requirements-aptos.txt
 # Copy only shared API code and APTOS assets: this image contains no PyTorch or IDRiD checkpoint.
 COPY backend/app/__init__.py ./app/__init__.py
 COPY backend/app/core ./app/core
-COPY backend/app/api/__init__.py backend/app/api/model_routes.py ./app/api/
+COPY backend/app/api/__init__.py backend/app/api/model_routes.py backend/app/api/doctor_routes.py ./app/api/
 COPY backend/app/model_app.py backend/app/main_aptos.py ./app/
 COPY backend/app/services/__init__.py backend/app/services/aptos_service.py ./app/services/
 COPY backend/app/models/__init__.py ./app/models/__init__.py
