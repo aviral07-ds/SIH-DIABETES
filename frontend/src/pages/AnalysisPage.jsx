@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Eye, Activity, ShieldCheck, AlertCircle, ArrowRight, Layers, ZoomIn, FileText, CheckCircle } from 'lucide-react';
+import { Eye, Activity, ShieldCheck, AlertCircle, ArrowRight, Layers, ZoomIn, FileText, CheckCircle, MapPin } from 'lucide-react';
+import NearbySpecialistsModal from '../components/NearbySpecialistsModal';
 
 export default function AnalysisPage({ data, setActiveTab }) {
   const [activeChannel, setActiveChannel] = useState('both');
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [isSpecialistsModalOpen, setIsSpecialistsModalOpen] = useState(false);
 
   if (!data) return null;
 
@@ -219,6 +221,13 @@ export default function AnalysisPage({ data, setActiveTab }) {
               <span>Recommended Specialist Referral</span>
             </div>
             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{data.recommendations.referral}</p>
+            <button
+              onClick={() => setIsSpecialistsModalOpen(true)}
+              className="mt-2 inline-flex items-center space-x-1.5 text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 px-3 py-1.5 rounded-xl border border-sky-200 dark:border-sky-800 transition-colors"
+            >
+              <MapPin className="w-3.5 h-3.5 text-rose-500" />
+              <span>Locate Nearby Eye Specialists & Hospital Centers →</span>
+            </button>
           </div>
 
           <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-sky-200 dark:border-sky-800 shadow-sm space-y-2">
@@ -230,6 +239,13 @@ export default function AnalysisPage({ data, setActiveTab }) {
           </div>
         </div>
       </div>
+
+      {/* Nearby Specialists Interactive Directory Modal */}
+      <NearbySpecialistsModal 
+        isOpen={isSpecialistsModalOpen}
+        onClose={() => setIsSpecialistsModalOpen(false)}
+        selectedDistrict={data?.patient?.facility?.includes('Satara') ? 'Satara' : 'All'}
+      />
 
     </div>
   );

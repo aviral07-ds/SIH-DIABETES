@@ -1,10 +1,12 @@
-import React from 'react';
-import { AlertTriangle, CheckCircle, Clock, FileText, Printer, ArrowRight, Info, ShieldAlert, CheckSquare, UserPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertTriangle, CheckCircle, Clock, FileText, Printer, ArrowRight, Info, ShieldAlert, CheckSquare, UserPlus, MapPin, Phone, Navigation, Building2, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import NearbySpecialists from '../components/NearbySpecialists';
+import NearbySpecialistsModal from '../components/NearbySpecialistsModal';
 
 export default function ResultPage({ data, setActiveTab }) {
   const { t, language } = useLanguage();
+  const [isSpecialistsModalOpen, setIsSpecialistsModalOpen] = useState(false);
   if (!data) return null;
 
   const handlePrint = () => {
@@ -231,7 +233,13 @@ export default function ResultPage({ data, setActiveTab }) {
           </div>
 
           {/* Nearby Eye Specialists Finder */}
-          <NearbySpecialists />
+          <NearbySpecialists onOpenDirectory={() => setIsSpecialistsModalOpen(true)} />
+
+          {/* Full Directory Modal */}
+          <NearbySpecialistsModal 
+            isOpen={isSpecialistsModalOpen} 
+            onClose={() => setIsSpecialistsModalOpen(false)} 
+          />
 
           {/* Bottom Disclaimer */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex items-start space-x-3">
@@ -242,6 +250,13 @@ export default function ResultPage({ data, setActiveTab }) {
         </div>
 
       </div>
+
+      {/* Nearby Specialists Interactive Directory Modal */}
+      <NearbySpecialistsModal 
+        isOpen={isSpecialistsModalOpen}
+        onClose={() => setIsSpecialistsModalOpen(false)}
+        selectedDistrict={data?.patient?.facility?.includes('Satara') ? 'Satara' : 'All'}
+      />
 
     </div>
   );
