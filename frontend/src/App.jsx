@@ -7,6 +7,7 @@ import ScreeningPage from './pages/ScreeningPage';
 import ResultPage from './pages/ResultPage';
 import AnalysisPage from './pages/AnalysisPage';
 import ReportPage from './pages/ReportPage';
+import HowItWorksPage from './pages/HowItWorksPage';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -39,7 +40,7 @@ export default function App() {
           )}
 
           {activeTab === 'how-it-works' && (
-            <HomePage setActiveTab={setActiveTab} />
+            <HowItWorksPage setActiveTab={setActiveTab} />
           )}
 
           {activeTab === 'screening' && (
