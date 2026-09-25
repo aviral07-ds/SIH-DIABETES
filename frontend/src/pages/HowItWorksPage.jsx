@@ -3,7 +3,8 @@ import {
   PlayCircle, Eye, ShieldCheck, Cpu, Activity, Award, CheckCircle, 
   ArrowRight, FileText, Printer, MapPin, AlertTriangle, Layers, 
   HelpCircle, Camera, CheckSquare, Sparkles, UserCheck, Stethoscope, 
-  Clock, Download, ChevronRight, Globe
+  Clock, Download, ChevronRight, Globe, Network, GitBranch, Binary,
+  Sliders, Server, ArrowDown, Database, Check
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -12,10 +13,10 @@ export default function HowItWorksPage({ setActiveTab }) {
   const currentLang = language || lang || 'en';
   const isHi = currentLang === 'hi';
 
-  const [activeSection, setActiveSection] = useState('workflow'); // 'workflow', 'severity', 'hardware', 'faq'
+  const [activeSection, setActiveSection] = useState('workflow'); // 'workflow', 'architecture', 'severity', 'hardware', 'faq'
   const [activeStep, setActiveStep] = useState(0);
 
-  // Workflow 6 Steps content in English and Hindi
+  // Workflow 6 Steps content in English and Hindi (Zero offline claim, API-based)
   const steps = [
     {
       num: '01',
@@ -37,23 +38,23 @@ export default function HowItWorksPage({ setActiveTab }) {
       ],
       tip: isHi 
         ? 'सुझाव: यदि रोगी के पास आभा आईडी नहीं है, तो प्रणाली स्वचालित रूप से एक अनूठा स्क्रीनिंग टोकन प्रदान करती है।'
-        : 'Tip: If patient does not have an ABHA ID, the system automatically assigns an offline screening reference number.'
+        : 'Tip: If patient does not have an ABHA ID, the system automatically assigns a unique screening reference token.'
     },
     {
       num: '02',
       title: isHi ? 'फंडस छवि कैप्चर एवं गुणवत्ता जांच' : 'Fundus Photography Capture & Quality Filter',
       tag: isHi ? 'चरण 2: छवि इनपुट' : 'Step 2: Fundus Input',
       desc: isHi 
-        ? 'गैर-मायड्रिएटिक फंडस कैमरे या स्मार्टफोन स्लिट-लैंप एडाप्टर से 45° मैकुला-केंद्रित रेटिना फोटो अपलोड करें। दृष्टि केयर का स्वचालित फ़िल्टर तुरंत धुंधली या खराब छवियों को अस्वीकार कर देता है।'
-        : 'Upload a 45° macula-centered retinal photograph captured using a non-mydriatic fundus camera or smartphone attachment. The automatic filter rejects blurs in under 40ms.',
+        ? 'गैर-मायड्रिएटिक फंडस कैमरे या स्मार्टफोन स्लिट-लैंप एडाप्टर से 45° मैकुला-केंद्रित रेटिना फोटो अपलोड करें। दृष्टि केयर का स्वचालित लाप्लासियन फ़िल्टर तुरंत धुंधली या खराब छवियों को अस्वीकार कर देता है।'
+        : 'Upload a 45° macula-centered retinal photograph captured using a non-mydriatic fundus camera or smartphone attachment. The automatic Laplacian filter rejects blurs in under 40ms.',
       bullets: isHi ? [
         'JPG, PNG, या TIFF प्रारूपों का समर्थन करता है।',
-        'स्वचालित एंटी-स्पूफ और गुणवत्ता फ़िल्टर: गैर-रेटिना या अत्यधिक धुंधली छवियों को अस्वीकार करता है।',
+        'स्वचालित लाप्लासियन गुणवत्ता फ़िल्टर: गैर-रेटिना या अत्यधिक धुंधली छवियों को तुरंत रोकता है।',
         'तुरंत डेमो विकल्प: त्वरित परीक्षण के लिए पहले से मौजूद 5 नैदानिक नमूना स्कैन में से कोई भी चुनें।',
         'बिना पुतली फैलाए (Non-mydriatic) सामान्य प्रकाश में काम करता है।'
       ] : [
         'Supports standard JPG, PNG, and TIFF fundus image formats.',
-        'Automated anti-spoof & quality gatekeeper: instantly flags blurs and non-retinal uploads.',
+        'Automated Laplacian quality gatekeeper: instantly flags blurs and non-retinal uploads.',
         'Instant Demo option: select any of 5 pre-configured clinical sample scans in 1 click.',
         'Optimized for non-mydriatic captures without requiring chemical eye dilation.'
       ],
@@ -63,21 +64,21 @@ export default function HowItWorksPage({ setActiveTab }) {
     },
     {
       num: '03',
-      title: isHi ? 'एज एआई न्यूरल विश्लेषण (1.8 सेकंड)' : 'Edge AI Neural Diagnostic Inference (<1.8s)',
-      tag: isHi ? 'चरण 3: डीप लर्निंग' : 'Step 3: Edge Inference',
+      title: isHi ? 'मल्टी-मॉडल एआई न्यूरल विश्लेषण (API-आधारित)' : 'Multi-Model AI Neural Diagnostic Inference (API-Based)',
+      tag: isHi ? 'चरण 3: एआई विश्लेषण' : 'Step 3: Multi-Model Inference',
       desc: isHi 
-        ? 'बटन दबाते ही स्थानीय PyTorch डीप लर्निंग मॉडल पूरी तरह से ऑफलाइन बिना इंटरनेट के काम करता है। यह पिक्सेल-स्तर पर घावों का विभाजन और ग्रैड-सीएएम++ ध्यान हीटमैप तैयार करता है।'
-        : 'Upon clicking Analyze, the on-device PyTorch model executes locally without sending data to the cloud. It generates pixel-level lesion masks and Grad-CAM++ saliency heatmaps.',
+        ? 'बटन दबाते ही उच्च-प्रदर्शन PyTorch बैकएंड एपीआई तुरंत छवि को प्रोसेस करती है। U-Net पिक्सेल-स्तर पर घावों का विभाजन करता है और ResNet-50 ग्रैड-सीएएम++ ध्यान हीटमैप तैयार करता है।'
+        : 'Upon clicking Analyze, the high-performance PyTorch backend API processes the retinal scan. U-Net generates pixel-level lesion masks while ResNet-50 synthesizes Grad-CAM++ saliency heatmaps.',
       bullets: isHi ? [
-        'शून्य इंटरनेट आवश्यकता: दूरदराज के ग्रामीण प्राथमिक स्वास्थ्य केंद्रों में पूरी तरह काम करता है।',
+        'एपीआई-आधारित मल्टी-मॉडल पाइपलाइन: U-Net और ResNet-50 का समन्वित संयोजन।',
         'मल्टी-घाव विभाजन: माइक्रोएन्यूरिज्म, रक्तस्राव, हार्ड एक्सयूडेट्स और कॉटन वूल स्पॉट्स की पहचान।',
         'ग्रैड-सीएएम++ दृश्य तर्क: यह दिखाता है कि एआई ने किस घाव को देखकर गंभीरता का निर्णय लिया।',
-        'मात्र 1.8 सेकंड में संपूर्ण विश्लेषण पूरा होता है।'
+        'द्रुत गति: तेज एपीआई प्रतिक्रिया समय के साथ संपूर्ण ट्राइएज परिणाम तैयार होता है।'
       ] : [
-        'Zero internet required: runs entirely on local laptop or edge device at rural PHCs.',
+        'API-Based Multi-Model Pipeline: coordinated ensemble of U-Net segmentation and ResNet-50 classification.',
         'Multi-lesion segmentation: detects microaneurysms, hemorrhages, and hard exudates.',
         'Grad-CAM++ visual reasoning: pinpoints the exact pathological clusters driving the diagnosis.',
-        'Ultra-fast: complete analysis finishes in approximately 1.8 seconds.'
+        'Rapid response: fast inference API delivering complete clinical results in seconds.'
       ],
       tip: isHi 
         ? 'सुझाव: "लाइव विश्लेषण" टैब पर जाकर आप ऑप्टिकल स्कैन और हीटमैप को अगल-बगल देख सकते हैं।'
@@ -102,7 +103,7 @@ export default function HowItWorksPage({ setActiveTab }) {
         'Health worker checklist: blood pressure, glucose monitoring, and counseling steps.'
       ],
       tip: isHi 
-        ? 'सुझाव: परिणाम स्क्रीन पर दिया गया "एआई विश्लेषण देखें" बटन आपको मॉडल के हीटमैप पर ले जाता है।'
+        ? 'सुझाव: परिणाम स्क्रीन पर दिया गया प्रमुख डार्क "एआई विश्लेषण देखें" बटन आपको मॉडल के हीटमैप पर ले जाता है।'
         : 'Tip: The prominent dark "View AI Analysis" button allows clinicians to visually verify every finding.'
     },
     {
@@ -200,19 +201,43 @@ export default function HowItWorksPage({ setActiveTab }) {
     }
   ];
 
-  // Frequently Asked Questions
+  // Real Algorithms & Architectural FAQ Content (NO offline claim)
   const faqs = [
     {
-      q: isHi ? '1. क्या दृष्टि केयर को चलाने के लिए लगातार इंटरनेट की आवश्यकता है?' : '1. Does Drishti Care require continuous internet connectivity?',
-      a: isHi 
-        ? 'नहीं! दृष्टि केयर का एआई मॉडल (PyTorch U-Net & ResNet) पूरी तरह से आपके लैपटॉप, टैबलेट या एज डिवाइस पर स्थानीय रूप से चलता है। दूरदराज के ग्रामीण शिविरों में बिना किसी मोबाइल नेटवर्क के पूरी स्क्रीनिंग की जा सकती है।'
-        : 'No! Drishti Care runs completely offline. The inference engine executes locally on your laptop, mini-PC, or tablet with zero cloud dependency, making it 100% reliable for remote rural camps without cellular reception.'
+      q: isHi ? '1. दृष्टि केयर में वास्तव में कौन से एआई मॉडल, एल्गोरिदम और आर्किटेक्चर उपयोग किए जाते हैं?' : '1. What AI models, algorithms, and architectures are actually used in Drishti Care?',
+      a: isHi ? (
+        <div className="space-y-2 text-xs sm:text-sm">
+          <p className="font-semibold text-slate-800 dark:text-slate-200">
+            दृष्टि केयर एक अत्याधुनिक मल्टी-मॉडल डीप लर्निंग पाइपलाइन पर काम करता है जिसमें निम्नलिखित प्रमुख एल्गोरिदम शामिल हैं:
+          </p>
+          <ul className="list-disc pl-5 space-y-1.5 text-slate-700 dark:text-slate-300">
+            <li><strong>PyTorch U-Net (घाव विभाजन):</strong> स्किप-कनेक्शन के साथ एनकोडर-डिकोडर नेटवर्क, जो IDRiD और DIARETDB1 डेटासेट पर प्रशिक्षित है। यह माइक्रोएन्यूरिज्म (MA), रक्तस्राव (HE), हार्ड एक्सयूडेट्स (EX) और कॉटन वूल स्पॉट्स (SE) का पिक्सेल-स्तर पर विभाजन करता है।</li>
+            <li><strong>ResNet-50 / DenseNet (गंभीरता क्लासिफायर):</strong> डीप कन्वेन्शनल न्यूरल नेटवर्क, जो Kaggle EyePACS और IDRiD पर प्रशिक्षित है। यह सॉफ्टमैक्स प्रोबेबिलिटी के साथ ICDR स्टेज 0 से 4 तक 5-स्तरीय गंभीरता वर्गीकरण प्रदान करता है।</li>
+            <li><strong>Grad-CAM++ (व्याख्यात्मक एआई):</strong> जेनरलाइज्ड क्लास एक्टिवेशन मैपिंग जो अंतिम कन्वेन्शनल लेयर के द्वितीय-क्रम ग्रेडिएंट्स (2nd-order gradients) की गणना करके थर्मल ध्यान हीटमैप उत्पन्न करता है।</li>
+            <li><strong>लाप्लासियन वेरियंस फ़िल्टर (गुणवत्ता फ़िल्टर):</strong> OpenCV-आधारित लाप्लासियन ऑपरेटर <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">Var(∇²I) &gt; 100</code> जो अनुमान से पहले धुंधली या अमान्य छवियों को 40ms से कम समय में अस्वीकार करता है।</li>
+            <li><strong>फास्टएपीआई (FastAPI) आरईएसटी इंजन:</strong> अतुल्यकालिक (Asynchronous) पायथन बैकएंड जो मल्टी-मॉडल पाइपलाइन का समन्वय करता है।</li>
+          </ul>
+        </div>
+      ) : (
+        <div className="space-y-2 text-xs sm:text-sm">
+          <p className="font-semibold text-slate-800 dark:text-slate-200">
+            Drishti Care operates on a production multi-model deep learning pipeline incorporating the following verified algorithms:
+          </p>
+          <ul className="list-disc pl-5 space-y-1.5 text-slate-700 dark:text-slate-300">
+            <li><strong>PyTorch U-Net (Lesion Segmentation):</strong> Encoder-decoder network with skip connections trained on IDRiD and DIARETDB1 datasets. Performs pixel-level semantic segmentation for microaneurysms (MA), hemorrhages (HE), hard exudates (EX), and soft exudates (SE).</li>
+            <li><strong>ResNet-50 / DenseNet Backbone (ICDR Staging):</strong> Deep convolutional residual network trained on Kaggle EyePACS and IDRiD to classify fundus scans across the 5 ICDR clinical severity stages (0 to 4) with softmax confidence scoring.</li>
+            <li><strong>Grad-CAM++ (Visual Explainability):</strong> Generalized Class Activation Mapping computing second-order partial gradients over the final convolutional layer feature maps to synthesize high-resolution spatial saliency heatmaps.</li>
+            <li><strong>Laplacian Variance Quality Gate:</strong> OpenCV deterministic spatial frequency operator <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">Var(∇²I) &gt; 100</code> validating image focus and illumination in &lt;40ms prior to neural inference.</li>
+            <li><strong>FastAPI & PyTorch REST Engine:</strong> High-throughput asynchronous backend service orchestrating model execution, JSON structured triage payloads, and base64 heatmap synthesis.</li>
+          </ul>
+        </div>
+      )
     },
     {
       q: isHi ? '2. यदि फंडस छवि धुंधली या खराब ली गई हो तो क्या होगा?' : '2. What happens if a captured fundus image is blurry or dark?',
       a: isHi 
-        ? 'प्रणाली में एक स्वचालित गुणवत्ता फ़िल्टर (<40ms) लगा है। यदि छवि धुंधली, अत्यधिक अंधेरी या गैर-रेटिना है, तो यह तुरंत त्रुटि दिखाती है और कार्यकर्ता को पुनः स्पष्ट फोटो लेने का निर्देश देती है ताकि कोई गलत परिणाम न निकले।'
-        : 'Drishti Care features an automated image quality gatekeeper (<40ms). If an image is blurry, poorly illuminated, or not a retinal scan, it immediately rejects it and prompts the operator to recapture, preventing diagnostic hallucinations.'
+        ? 'प्रणाली में एक स्वचालित लाप्लासियन गुणवत्ता फ़िल्टर (<40ms) लगा है। यदि छवि धुंधली, अत्यधिक अंधेरी या गैर-रेटिना है, तो यह तुरंत त्रुटि दिखाती है और कार्यकर्ता को पुनः स्पष्ट फोटो लेने का निर्देश देती है ताकि कोई गलत परिणाम न निकले।'
+        : 'Drishti Care features an automated image quality gatekeeper (<40ms). If an image is blurry, poorly illuminated, or not a retinal scan, it immediately rejects it and prompts the operator to recapture, preventing diagnostic errors.'
     },
     {
       q: isHi ? '3. क्या यह एक अंतिम चिकित्सा निदान है?' : '3. Is this an official autonomous medical diagnosis?',
@@ -249,7 +274,7 @@ export default function HowItWorksPage({ setActiveTab }) {
           <div className="flex flex-wrap items-center gap-3">
             <span className="bg-sky-500/20 text-sky-300 border border-sky-400/40 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider flex items-center space-x-1.5">
               <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-              <span>{isHi ? "संपूर्ण परिचालन मार्गदर्शिका" : "COMPLETE OPERATIONAL USER GUIDE"}</span>
+              <span>{isHi ? "संपूर्ण परिचालन एवं आर्किटेक्चर गाइड" : "OPERATIONAL WORKFLOW & ARCHITECTURE GUIDE"}</span>
             </span>
 
             <button
@@ -263,16 +288,16 @@ export default function HowItWorksPage({ setActiveTab }) {
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
             {isHi ? (
-              <>दृष्टि केयर का उपयोग कैसे करें: <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">चरण-दर-चरण कार्यप्रणाली</span></>
+              <>दृष्टि केयर का उपयोग कैसे करें: <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">कार्यप्रणाली एवं आर्किटेक्चर</span></>
             ) : (
-              <>How Drishti Care Works: <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">Step-by-Step Practical Guide</span></>
+              <>How Drishti Care Works: <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">Workflow & Multi-Model Pipeline</span></>
             )}
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
             {isHi 
-              ? "सामुदायिक स्वास्थ्य कार्यकर्ताओं (ASHA/ANM), शिविर चिकित्सकों और प्राथमिक चिकित्सा अधिकारियों के लिए बिंदु-पर-देखभाल रेटिना स्क्रीनिंग, एआई व्याख्या और ABDM रेफरल पर्ची जारी करने की संपूर्ण गाइड।"
-              : "A comprehensive handbook for community health workers, screening camp volunteers, and primary medical officers on running point-of-care retinal screenings, interpreting AI triage results, and issuing ABDM referral slips."}
+              ? "सामुदायिक स्वास्थ्य कार्यकर्ताओं, चिकित्सकों और स्वास्थ्य अधिकारियों के लिए बिंदु-पर-देखभाल रेटिना स्क्रीनिंग, मल्टी-मॉडल एआई आर्किटेक्चर (U-Net + ResNet-50 + Grad-CAM++) और ABDM रेफरल पर्ची की संपूर्ण मार्गदर्शिका।"
+              : "A comprehensive operational walkthrough covering the multi-model neural pipeline (PyTorch U-Net + ResNet-50 + Grad-CAM++), clinical triage classification, doctor locator, and ABDM referral generation."}
           </p>
 
           <div className="flex flex-wrap gap-3 pt-2">
@@ -285,11 +310,11 @@ export default function HowItWorksPage({ setActiveTab }) {
             </button>
 
             <button
-              onClick={() => setActiveTab('analysis')}
+              onClick={() => setActiveSection('architecture')}
               className="bg-slate-900/90 hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded-xl border border-slate-700 transition-all text-sm flex items-center space-x-2"
             >
-              <Layers className="w-4 h-4 text-sky-400" />
-              <span>{isHi ? "एआई विश्लेषण चैनल देखें" : "View Dual-Channel Analysis"}</span>
+              <Network className="w-4 h-4 text-sky-400" />
+              <span>{isHi ? "सिस्टम आर्किटेक्चर आरेख देखें" : "View Architecture Diagram"}</span>
             </button>
           </div>
 
@@ -300,10 +325,10 @@ export default function HowItWorksPage({ setActiveTab }) {
       <div className="flex flex-wrap border-b border-slate-200 dark:border-slate-800 gap-2 pb-2">
         <button
           onClick={() => setActiveSection('workflow')}
-          className={`px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all flex items-center space-x-2 ${
+          className={`px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all flex items-center space-x-2 ${
             activeSection === 'workflow'
               ? 'bg-sky-600 text-white shadow-md'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <Activity className="w-4 h-4" />
@@ -311,11 +336,23 @@ export default function HowItWorksPage({ setActiveTab }) {
         </button>
 
         <button
+          onClick={() => setActiveSection('architecture')}
+          className={`px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all flex items-center space-x-2 ${
+            activeSection === 'architecture'
+              ? 'bg-sky-600 text-white shadow-md'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Network className="w-4 h-4" />
+          <span>{isHi ? "सिस्टम आर्किटेक्चर (आरेख)" : "System Architecture (Diagram)"}</span>
+        </button>
+
+        <button
           onClick={() => setActiveSection('severity')}
-          className={`px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all flex items-center space-x-2 ${
+          className={`px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all flex items-center space-x-2 ${
             activeSection === 'severity'
               ? 'bg-sky-600 text-white shadow-md'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <AlertTriangle className="w-4 h-4" />
@@ -324,26 +361,26 @@ export default function HowItWorksPage({ setActiveTab }) {
 
         <button
           onClick={() => setActiveSection('hardware')}
-          className={`px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all flex items-center space-x-2 ${
+          className={`px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all flex items-center space-x-2 ${
             activeSection === 'hardware'
               ? 'bg-sky-600 text-white shadow-md'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <Camera className="w-4 h-4" />
-          <span>{isHi ? "कैमरा एवं हार्डवेयर सेटअप" : "Hardware & Camera Setup"}</span>
+          <span>{isHi ? "कैमरा एवं हार्डवेयर सेटअप" : "Hardware Setup"}</span>
         </button>
 
         <button
           onClick={() => setActiveSection('faq')}
-          className={`px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all flex items-center space-x-2 ${
+          className={`px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all flex items-center space-x-2 ${
             activeSection === 'faq'
               ? 'bg-sky-600 text-white shadow-md'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <HelpCircle className="w-4 h-4" />
-          <span>{isHi ? "अक्सर पूछे जाने वाले प्रश्न" : "Frequently Asked Questions"}</span>
+          <span>{isHi ? "एल्गोरिदम एवं प्रश्न (FAQ)" : "Algorithms & FAQs"}</span>
         </button>
       </div>
 
@@ -448,7 +485,203 @@ export default function HowItWorksPage({ setActiveTab }) {
         </div>
       )}
 
-      {/* SECTION 2: SEVERITY STAGING GUIDE */}
+      {/* SECTION 2: SYSTEM ARCHITECTURE DIAGRAM */}
+      {activeSection === 'architecture' && (
+        <div className="space-y-8">
+          
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-10 border border-slate-200 dark:border-slate-800 shadow-xl space-y-8">
+            <div>
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 text-xs font-black uppercase tracking-wider">
+                <Network className="w-3.5 h-3.5" />
+                <span>{isHi ? "मल्टी-मॉडल पाइपलाइन आरेख" : "MULTI-MODEL PIPELINE ARCHITECTURE"}</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">
+                {isHi ? "सिस्टम आर्किटेक्चर एवं डेटा प्रवाह आरेख" : "System Architecture & End-to-End Dataflow"}
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-3xl">
+                {isHi 
+                  ? "दृष्टि केयर एक मॉड्यूलर, एंड-टू-एंड डीप लर्निंग पाइपलाइन लागू करता है जो कच्चे ऑप्टिकल फंडस इनपुट से लेकर पिक्सेल-स्तरीय घाव विभाजन, ग्रैड-सीएएम++ दृश्य तर्क और राष्ट्रीय स्वास्थ्य प्राधिकरण (ABDM M3) सारांश तक प्रवाहित होता है।"
+                  : "Drishti Care implements a modular multi-model deep learning pipeline progressing from raw 45° fundus photography to pixel-level U-Net lesion segmentation, Grad-CAM++ saliency, and ABDM referral generation."}
+              </p>
+            </div>
+
+            {/* VISUAL ARCHITECTURE FLOWCHART DIAGRAM */}
+            <div className="space-y-6">
+              
+              {/* STAGE 1: Ingestion & Quality Gate */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <div className="md:col-span-4 bg-slate-950 text-white p-5 rounded-2xl border-2 border-slate-800 shadow space-y-2">
+                  <div className="flex items-center space-x-2 text-sky-400 text-xs font-bold uppercase">
+                    <Camera className="w-4 h-4" />
+                    <span>{isHi ? "लेयर 1: फंडस इनपुट" : "Layer 1: Fundus Ingestion"}</span>
+                  </div>
+                  <h4 className="font-extrabold text-base text-white">45° Optical Fundus Capture</h4>
+                  <p className="text-xs text-slate-400">Non-mydriatic RGB photo (JPG / PNG / TIFF) • 512×512 Normalized Tensor</p>
+                  <span className="inline-block bg-sky-950 text-sky-300 border border-sky-800 text-[10px] font-mono px-2 py-0.5 rounded">
+                    Input: [Batch, 3, 512, 512]
+                  </span>
+                </div>
+
+                <div className="hidden md:flex md:col-span-1 justify-center">
+                  <ArrowRight className="w-6 h-6 text-sky-500 animate-pulse" />
+                </div>
+
+                <div className="md:col-span-7 bg-amber-50 dark:bg-amber-950/30 p-5 rounded-2xl border-2 border-amber-300 dark:border-amber-800 shadow space-y-2">
+                  <div className="flex items-center space-x-2 text-amber-800 dark:text-amber-300 text-xs font-bold uppercase">
+                    <Sliders className="w-4 h-4" />
+                    <span>{isHi ? "लेयर 2: लाप्लासियन गुणवत्ता गेटकीपर" : "Layer 2: Laplacian Quality Gatekeeper (<40ms)"}</span>
+                  </div>
+                  <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Deterministic Spatial Frequency Filter</h4>
+                  <p className="text-xs text-slate-700 dark:text-slate-300">
+                    Calculates Laplacian operator variance: <code className="bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded font-mono font-bold text-amber-900 dark:text-amber-200">Var(∇²I) &gt; 100</code>. Rejects blurs, optical crescents, and non-retinal uploads automatically.
+                  </p>
+                </div>
+              </div>
+
+              {/* Vertical Connector */}
+              <div className="flex justify-center">
+                <ArrowDown className="w-6 h-6 text-slate-400 dark:text-slate-600" />
+              </div>
+
+              {/* STAGE 2: DUAL-CHANNEL MULTI-MODEL CORE */}
+              <div className="bg-slate-950 text-white p-6 sm:p-8 rounded-3xl border-2 border-sky-600/70 shadow-2xl space-y-6 relative overflow-hidden">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-400 flex items-center justify-center font-bold">
+                      <Cpu className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-sky-400 tracking-wider">
+                        {isHi ? "कोर एआई इंजन" : "CORE DEEP LEARNING ENGINE"}
+                      </span>
+                      <h3 className="text-lg font-black text-white">
+                        {isHi ? "मल्टी-मॉडल न्यूरल पाइपलाइन (PyTorch)" : "Multi-Model Neural Pipeline (PyTorch Inference)"}
+                      </h3>
+                    </div>
+                  </div>
+                  <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-bold px-3 py-1 rounded-full">
+                    FastAPI Orchestrated
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                  {/* Model A: U-Net */}
+                  <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <span className="bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[10px] font-bold px-2 py-0.5 rounded">
+                        MODEL A: SEGMENTATION
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">IDRiD / DIARETDB1</span>
+                    </div>
+                    <h4 className="font-extrabold text-base text-white">PyTorch U-Net Architecture</h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Encoder-decoder with dense skip connections. Segments microvascular pathologies across 4 specific biomarker classes:
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 font-mono">
+                      <div className="bg-slate-950 p-2 rounded border border-slate-800 text-rose-400">
+                        • Microaneurysms (MA)
+                      </div>
+                      <div className="bg-slate-950 p-2 rounded border border-slate-800 text-amber-400">
+                        • Hard Exudates (EX)
+                      </div>
+                      <div className="bg-slate-950 p-2 rounded border border-slate-800 text-red-400">
+                        • Hemorrhages (HE)
+                      </div>
+                      <div className="bg-slate-950 p-2 rounded border border-slate-800 text-sky-300">
+                        • Cotton Wool (SE)
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Model B: ResNet-50 + Grad-CAM++ */}
+                  <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <span className="bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] font-bold px-2 py-0.5 rounded">
+                        MODEL B: CLASSIFICATION & SALIENCY
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">EyePACS / IDRiD</span>
+                    </div>
+                    <h4 className="font-extrabold text-base text-white">ResNet-50 &amp; Grad-CAM++ Engine</h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Multi-stage convolutional classifier predicting ICDR severity stages (0 to 4) paired with 2nd-order gradient saliency mapping:
+                    </p>
+                    <div className="space-y-1.5 pt-1 text-[11px] text-slate-300">
+                      <div className="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                        <span>Classification Output:</span>
+                        <strong className="text-white font-mono">ICDR Stage 0 - 4 (Softmax)</strong>
+                      </div>
+                      <div className="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                        <span>Saliency Attribution:</span>
+                        <strong className="text-emerald-400 font-mono">Grad-CAM++ Heatmap</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Vertical Connector */}
+              <div className="flex justify-center">
+                <ArrowDown className="w-6 h-6 text-slate-400 dark:text-slate-600" />
+              </div>
+
+              {/* STAGE 3: Decision Engine & Biomarkers */}
+              <div className="bg-sky-50 dark:bg-sky-950/40 p-6 rounded-3xl border-2 border-sky-200 dark:border-sky-800 space-y-3">
+                <div className="flex items-center space-x-2 text-sky-800 dark:text-sky-300 text-xs font-bold uppercase">
+                  <Stethoscope className="w-4 h-4" />
+                  <span>{isHi ? "लेयर 3: क्लिनिकल निर्णय समर्थन एवं बायोमार्कर परिमाणक" : "Layer 3: Clinical Decision Support & Biomarker Quantifier"}</span>
+                </div>
+                <h4 className="font-extrabold text-base text-slate-900 dark:text-white">
+                  Deterministic Referral Rule Engine &amp; ICD-10 Mapping
+                </h4>
+                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                  Synthesizes U-Net lesion area fractions with ResNet ICDR classifications to compute clinical urgency windows (Routine 12m, Follow-up 6m, Specialist 3-4w, Urgent 7-14d, Emergency 24-48h).
+                </p>
+              </div>
+
+              {/* Vertical Connector */}
+              <div className="flex justify-center">
+                <ArrowDown className="w-6 h-6 text-slate-400 dark:text-slate-600" />
+              </div>
+
+              {/* STAGE 4: Delivery Layer */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                
+                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                  <Printer className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                  <h5 className="font-extrabold text-sm text-slate-900 dark:text-white">ABDM Referral Slip</h5>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    High-contrast 1-page printable clinical referral slip with dual fundus &amp; Grad-CAM++ scan thumbnails.
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                  <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <h5 className="font-extrabold text-sm text-slate-900 dark:text-white">Doctor Geo-Locator</h5>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Integrated district hospital registry querying verified eye surgeons via user GPS or camp city name.
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                  <Database className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  <h5 className="font-extrabold text-sm text-slate-900 dark:text-white">ABHA Record Export</h5>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Full DICOM / PDF diagnostic report compliant with National Health Authority Ayushman Bharat standards.
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* SECTION 3: SEVERITY STAGING GUIDE */}
       {activeSection === 'severity' && (
         <div className="space-y-6">
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
@@ -501,7 +734,7 @@ export default function HowItWorksPage({ setActiveTab }) {
         </div>
       )}
 
-      {/* SECTION 3: HARDWARE & CAMERA SETUP */}
+      {/* SECTION 4: HARDWARE SETUP */}
       {activeSection === 'hardware' && (
         <div className="space-y-6">
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
@@ -526,8 +759,8 @@ export default function HowItWorksPage({ setActiveTab }) {
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   {isHi 
-                    ? "जैसे Zeiss Visucam, Topcon TRC-NW400, Canon CR-2, Forus 3nethra Neo। इनमें 45° मैकुला-केंद्रित दृश्य कैप्चर करें और सीधे सॉफ्टवेयर में ड्रैग-एंड-ड्रॉप करें।"
-                    : "Such as Forus 3nethra, Zeiss Visucam, Topcon TRC-NW, Canon CR-2. Save the 45° macula-centered capture and drag-and-drop into Drishti Care."}
+                    ? "जैसे Zeiss Visucam, Topcon TRC-NW400, Canon CR-2, Forus 3nethra Neo। इनमें 45° मैकुला-केंद्रित दृश्य कैप्चर करें और सीधे सॉफ्टवेयर में अपलोड करें।"
+                    : "Such as Forus 3nethra, Zeiss Visucam, Topcon TRC-NW, Canon CR-2. Save the 45° macula-centered capture and upload directly to the inference API."}
                 </p>
               </div>
 
@@ -546,7 +779,7 @@ export default function HowItWorksPage({ setActiveTab }) {
               </div>
             </div>
 
-            {/* 4 Golden Rules for Clear Images */}
+            {/* 4 Golden Rules */}
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
               <h3 className="font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">
                 {isHi ? "उच्च गुणवत्ता फंडस फोटोग्राफी के 4 स्वर्णिम नियम" : "4 Golden Rules for High-Quality Retinal Captures"}
@@ -587,12 +820,12 @@ export default function HowItWorksPage({ setActiveTab }) {
         </div>
       )}
 
-      {/* SECTION 4: FAQS */}
+      {/* SECTION 5: REAL ALGORITHMS & FAQS */}
       {activeSection === 'faq' && (
         <div className="space-y-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
             <h2 className="text-2xl font-black text-slate-900 dark:text-white">
-              {isHi ? "अक्सर पूछे जाने वाले प्रश्न (FAQ)" : "Frequently Asked Questions (FAQ)"}
+              {isHi ? "एल्गोरिदम एवं तकनीकी प्रश्न (FAQ)" : "Algorithms & Technical FAQ"}
             </h2>
 
             <div className="space-y-3 pt-2">
@@ -602,9 +835,9 @@ export default function HowItWorksPage({ setActiveTab }) {
                     <span className="text-sky-600 dark:text-sky-400 font-black">Q.</span>
                     <span>{faq.q}</span>
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pl-5 font-medium">
+                  <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pl-5 font-medium">
                     {faq.a}
-                  </p>
+                  </div>
                 </div>
               ))}
             </div>

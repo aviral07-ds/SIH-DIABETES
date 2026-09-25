@@ -1,15 +1,18 @@
 import React from 'react';
-import { PlayCircle, ShieldCheck, Zap, Server, Cpu, Activity, Award, CheckCircle, ArrowRight } from 'lucide-react';
+import { PlayCircle, ShieldCheck, Zap, Server, Cpu, Activity, Award, CheckCircle, ArrowRight, Layers, Sparkles } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function HomePage({ setActiveTab }) {
+  const { t, language, lang } = useLanguage();
+  const isHi = (language || lang) === 'hi';
 
   const pipelineStages = [
-    { num: '01', title: 'Fundus Capture', desc: 'Smartphone / desktop fundus camera attachment (45-50° FOV)', detail: 'Raw 12MP • Retina Scope' },
-    { num: '02', title: 'Edge Quality Triage', desc: 'Deterministic Laplacian variance & luminance validation in <40ms', detail: 'Reject Bad Scan • <40ms' },
-    { num: '03', title: 'Anatomical Masking', desc: 'Automated segmentation for optic disc, macula, and vessel architecture', detail: 'Segmentation • Dice 0.91' },
-    { num: '04', title: 'Severity Staging', desc: 'Multi-task classification across ICDR severity stages 0 to 4', detail: 'Classification • 5 Stages' },
-    { num: '05', title: 'Heatmap Synthesis', desc: 'High-resolution gradient-weighted attribution mapping for micro-lesion localization', detail: 'Explainability • Pixel Saliency' },
-    { num: '06', title: 'Clinician Report', desc: 'Generates ABDM compliant DICOM / PDF triage summary for MO review', detail: 'Triage Output • ABHA Ready' }
+    { num: '01', title: isHi ? 'फंडस कैप्चर' : 'Fundus Capture', desc: isHi ? 'स्मार्टफोन / डेस्कटॉप फंडस कैमरा अटैचमेंट (45-50° FOV)' : 'Smartphone / desktop fundus camera attachment (45-50° FOV)', detail: '12MP Optical • Retina Scope' },
+    { num: '02', title: isHi ? 'गुणवत्ता जांच' : 'Edge Quality Triage', desc: isHi ? 'लाप्लासियन भिन्नता एवं रोशनी जांच <40ms में' : 'Deterministic Laplacian variance & luminance validation in <40ms', detail: 'Reject Bad Scan • <40ms' },
+    { num: '03', title: isHi ? 'घाव विभाजन' : 'Lesion Segmentation', desc: isHi ? 'ऑप्टिक डिस्क, मैकुला और वाहिकाओं का स्वचालित U-Net विभाजन' : 'Automated U-Net segmentation for micro-lesions and vascular architecture', detail: 'U-Net • Multi-Class' },
+    { num: '04', title: isHi ? 'गंभीरता वर्गीकरण' : 'Severity Staging', desc: isHi ? 'ICDR स्टेज 0 से 4 तक मल्टी-टास्क क्लासिफिकेशन' : 'Multi-task classification across ICDR severity stages 0 to 4', detail: 'ResNet-50 • 5 Stages' },
+    { num: '05', title: isHi ? 'हीटमैप संश्लेषण' : 'Heatmap Synthesis', desc: isHi ? 'माइक्रो-घावों के स्थानीयकरण के लिए उच्च-रिज़ॉल्यूशन ग्रैड-सीएएम++' : 'High-resolution gradient-weighted attribution mapping for micro-lesion localization', detail: 'Grad-CAM++ • Saliency' },
+    { num: '06', title: isHi ? 'क्लीनिकल रिपोर्ट' : 'Clinician Report', desc: isHi ? 'एमओ समीक्षा के लिए ABDM अनुपालन DICOM / PDF ट्राइएज सारांश' : 'Generates ABDM compliant DICOM / PDF triage summary for MO review', detail: 'Triage Output • ABHA Ready' }
   ];
 
   return (
@@ -25,16 +28,20 @@ export default function HomePage({ setActiveTab }) {
         <div className="relative z-10 max-w-3xl space-y-6">
           
           <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-sky-900/80 border border-sky-700/60 text-sky-300 text-xs font-semibold tracking-wide">
-            <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
-            <span>SIH-2026 Special Section • Rural Health Tech</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
+            <span>{t.heroTag || "SIH-2026 Special Section • Rural Health Tech"}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-            Automated Retinal Screening Purpose—Built for India's <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">Rural Healthcare Frontier</span>
+            {isHi ? (
+              <>भारत की ग्रामीण स्वास्थ्य देखभाल के लिए <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">एआई-संचालित रेटिना स्क्रीनिंग</span></>
+            ) : (
+              <>Automated Retinal Screening Purpose—Built for India's <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">Rural Healthcare Frontier</span></>
+            )}
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Bridging the 1:100,000 specialist gap with edge-first automated analysis, image quality filtering, and transparent visual reasoning on low-cost fundus optical devices.
+            {t.heroDesc || "Bridging the 1:100,000 specialist gap with edge-first deep learning, automated image quality filtering, and transparent Grad-CAM++ visual reasoning on low-cost fundus optical devices."}
           </p>
 
           <div className="flex flex-wrap gap-4 pt-2">
@@ -43,29 +50,30 @@ export default function HomePage({ setActiveTab }) {
               className="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-sky-500/25 transition-all flex items-center space-x-2 text-sm"
             >
               <PlayCircle className="w-5 h-5 fill-slate-950 text-sky-400" />
-              <span>Start Live Screening Demo</span>
+              <span>{t.heroCtaStart || "Start Live Screening Demo"}</span>
             </button>
             <button
               onClick={() => setActiveTab('how-it-works')}
-              className="bg-slate-800/90 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold px-6 py-3.5 rounded-xl transition-all text-sm"
+              className="bg-slate-800/90 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold px-6 py-3.5 rounded-xl transition-all text-sm flex items-center space-x-2"
             >
-              Explore Screening Pipeline
+              <Layers className="w-4 h-4 text-sky-400" />
+              <span>{isHi ? "कार्यप्रणाली एवं आर्किटेक्चर देखें" : "Explore Screening Pipeline & Architecture"}</span>
             </button>
           </div>
 
-          {/* Key Stat Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6 border-t border-slate-800/80">
-            <div>
-              <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">End-to-End Analysis</p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">1.78s <span className="text-xs font-normal text-sky-400">(On Device)</span></p>
+          {/* Key Stat Cards - Exactly as requested */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-slate-800/80">
+            <div className="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800/80">
+              <p className="text-slate-400 text-[11px] font-bold uppercase tracking-wider">{t.statAiScreening || "AI-POWERED SCREENING"}</p>
+              <p className="text-lg sm:text-xl font-black text-white mt-1">Multi-Model <span className="text-xs font-semibold text-sky-400">Pipeline</span></p>
             </div>
-            <div>
-              <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">AUROC Clinical Accuracy</p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-400 mt-0.5">0.962 <span className="text-xs font-normal text-slate-400">(IDRiD Cohort)</span></p>
+            <div className="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800/80">
+              <p className="text-slate-400 text-[11px] font-bold uppercase tracking-wider">{t.statExplainableAi || "EXPLAINABLE AI"}</p>
+              <p className="text-lg sm:text-xl font-black text-emerald-400 mt-1">Grad-CAM++ <span className="text-xs font-semibold text-emerald-200">Insights</span></p>
             </div>
-            <div className="col-span-2 sm:col-span-1">
-              <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Deployment Readiness</p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-sky-300 mt-0.5">Offline <span className="text-xs font-normal text-slate-400">(Zero Cloud)</span></p>
+            <div className="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800/80">
+              <p className="text-slate-400 text-[11px] font-bold uppercase tracking-wider">{t.statDeployment || "DEPLOYMENT"}</p>
+              <p className="text-lg sm:text-xl font-black text-sky-300 mt-1">API-Based <span className="text-xs font-semibold text-sky-200">Inference</span></p>
             </div>
           </div>
 
