@@ -5,7 +5,8 @@ import { validateFundusImage } from '../services/imageValidator';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ScreeningPage({ onAnalysisComplete }) {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const isHi = lang === 'hi';
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
