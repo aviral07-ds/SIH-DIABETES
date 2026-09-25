@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import DrishtiLogo from '../components/DrishtiLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedStageInfo, getLocalizedEye } from '../i18n/translations';
 import NearbySpecialists from '../components/NearbySpecialists';
@@ -117,7 +118,7 @@ export default function ResultPage({ data, setActiveTab }) {
         </div>
 
         <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-4 py-2.5 rounded-2xl flex items-center space-x-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
           <div>
             <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">{t.triageLevelTag}</p>
             <p className="text-sm font-extrabold text-amber-900 dark:text-amber-200">{t.followUpRec}</p>
@@ -354,8 +355,8 @@ export default function ResultPage({ data, setActiveTab }) {
         {/* Top Official Banner */}
         <div className="flex justify-between items-start border-b-2 border-slate-800 pb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold">
-              <Eye className="w-7 h-7 text-sky-400" />
+            <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center p-1 border border-slate-700 shadow-sm">
+              <DrishtiLogo size={36} />
             </div>
             <div>
               <h2 className="font-black text-xl tracking-tight text-slate-900">

@@ -405,7 +405,7 @@ export default function HowItWorksPage({ setActiveTab }) {
                     {st.num}
                   </span>
                   {activeStep === idx && (
-                    <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                    <span className="w-2 h-2 rounded-full bg-sky-400"></span>
                   )}
                 </div>
                 <p className="font-extrabold text-xs line-clamp-2">{st.title}</p>

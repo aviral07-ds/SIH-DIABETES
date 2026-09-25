@@ -28,15 +28,15 @@ export default function HomePage({ setActiveTab }) {
         <div className="relative z-10 max-w-3xl space-y-6">
           
           <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-sky-900/80 border border-sky-700/60 text-sky-300 text-xs font-semibold tracking-wide">
-            <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
-            <span>{t.heroTag || "SIH-2026 Special Section • Rural Health Tech"}</span>
+            <Award className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+            <span>{t.heroTag || "Smart India Hackathon 2026 • Rural Health Tech"}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
             {isHi ? (
-              <>भारत की ग्रामीण स्वास्थ्य देखभाल के लिए <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">एआई-संचालित रेटिना स्क्रीनिंग</span></>
+              <>सुलभ ग्रामीण स्वास्थ्य सेवा के लिए <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">एआई-संचालित रेटिना स्क्रीनिंग</span></>
             ) : (
-              <>Automated Retinal Screening Purpose—Built for India's <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">Rural Healthcare Frontier</span></>
+              <>AI-Powered Retinal Screening for <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">Accessible Rural Healthcare</span></>
             )}
           </h1>
 

@@ -16,9 +16,8 @@ export const translations = {
     navReport: "Clinical Report",
     navHowItWorks: "How It Works",
 
-    // Home Page
-    heroTag: "SIH-2026 Special Section • Rural Health Tech",
-    heroTitle: "Explainable Retinal AI Purpose—Built for India's Rural Healthcare Frontier",
+    heroTag: "Smart India Hackathon 2026 • Rural Health Tech",
+    heroTitle: "AI-Powered Retinal Screening for Accessible Rural Healthcare",
     heroDesc: "Bridging the 1:100,000 specialist gap with edge-first deep learning, automated image quality filtering, and transparent Grad-CAM++ visual reasoning on low-cost fundus optical devices.",
     heroCtaStart: "Start Live Screening Demo",
     heroCtaExplore: "Explore Explainable AI Pipeline",
@@ -211,9 +210,8 @@ export const translations = {
     navReport: "क्लिनिकल रिपोर्ट",
     navHowItWorks: "यह कैसे काम करता है",
 
-    // Home Page
-    heroTag: "SIH-2026 विशेष अनुभाग • ग्रामीण स्वास्थ्य तकनीक",
-    heroTitle: "भारत की ग्रामीण स्वास्थ्य देखभाल के लिए विशेष निर्मित व्याख्या योग्य रेटिनल एआई",
+    heroTag: "स्मार्ट इंडिया हैकाथॉन 2026 • ग्रामीण स्वास्थ्य तकनीक",
+    heroTitle: "सुलभ ग्रामीण स्वास्थ्य सेवा के लिए एआई-संचालित रेटिना स्क्रीनिंग",
     heroDesc: "कम लागत वाले फंडस ऑप्टिकल उपकरणों पर एज-फर्स्ट डीप लर्निंग, स्वचालित छवि गुणवत्ता फ़िल्टरिंग, और पारदर्शी ग्रैड-सीएएम++ दृश्य तर्क के साथ विशेषज्ञ कमी को दूर करना।",
     heroCtaStart: "लाइव स्क्रीनिंग डेमो शुरू करें",
     heroCtaExplore: "व्याख्या योग्य एआई पाइपलाइन देखें",

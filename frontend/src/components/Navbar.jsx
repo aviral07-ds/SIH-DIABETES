@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eye, ShieldCheck, Activity, Globe, Sliders, PlayCircle, Moon, Sun } from 'lucide-react';
+import DrishtiLogo from './DrishtiLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -45,12 +46,12 @@ export default function Navbar({ activeTab, setActiveTab, onOpenApiSettings }) {
             onClick={() => setActiveTab('home')}
             className="flex items-center space-x-3 cursor-pointer group"
           >
-            <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-sky-600 text-sky-400 dark:text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform border border-slate-700 dark:border-sky-500">
-              <Eye className="w-6 h-6 stroke-[2.2]" />
+            <div className="w-10 h-10 rounded-xl bg-slate-950 dark:bg-slate-900 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform border border-slate-700/80 dark:border-sky-500/40 p-1">
+              <DrishtiLogo size={32} />
             </div>
             <div>
               <div className="flex items-center space-x-1.5">
-                <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">Drishti<span className="text-sky-600 dark:text-sky-400">Care</span></span>
+                <span className="font-black text-xl tracking-tight text-slate-900 dark:text-white">Drishti<span className="text-sky-500 dark:text-sky-400">Care</span></span>
                 <span className="bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-300 text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">{t.clinicalTriage}</span>
               </div>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wider uppercase">{t.pointOfCareEngine}</p>
@@ -77,16 +78,16 @@ export default function Navbar({ activeTab, setActiveTab, onOpenApiSettings }) {
           {/* Right Status Badges & CTAs */}
           <div className="flex items-center space-x-3">
             
-            {/* SIH Badge */}
+            {/* SIH Badge - Clean solid indicator without blinking */}
             <div className="hidden xl:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-300 text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
               <span>{t.sihBadge}</span>
             </div>
 
-            {/* Offline Edge AI Badge */}
-            <div className="hidden md:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-medium">
-              <Activity className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>{t.offlineEdgeAi}</span>
+            {/* API-Based AI Engine Badge */}
+            <div className="hidden md:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-700 text-sky-800 dark:text-sky-300 text-xs font-medium">
+              <Activity className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+              <span>{t.apiBasedAi || "API-Powered AI Engine"}</span>
             </div>
 
             {/* Dark Mode Toggle */}

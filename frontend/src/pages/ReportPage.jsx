@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Printer, Download, Share2, ShieldCheck, CheckCircle2, Award, Eye, FileText, AlertTriangle, Info } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import DrishtiLogo from '../components/DrishtiLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedStageInfo, getLocalizedEye } from '../i18n/translations';
 
@@ -117,8 +118,8 @@ export default function ReportPage({ data }) {
         {/* Report Header */}
         <div className="flex justify-between items-start border-b border-slate-200 dark:border-slate-800 pb-6">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-sky-600 text-sky-400 dark:text-white flex items-center justify-center font-bold shadow">
-              <Eye className="w-7 h-7" />
+            <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center p-1.5 border border-slate-700 shadow">
+              <DrishtiLogo size={36} />
             </div>
             <div>
               <h2 className="font-extrabold text-slate-900 dark:text-white text-xl tracking-tight">

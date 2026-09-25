@@ -1,5 +1,6 @@
 import React from 'react';
-import { Shield, Eye, AlertCircle } from 'lucide-react';
+import { Shield, AlertCircle } from 'lucide-react';
+import DrishtiLogo from './DrishtiLogo';
 
 export default function Footer({ setActiveTab }) {
   return (
@@ -10,8 +11,8 @@ export default function Footer({ setActiveTab }) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-800 dark:border-slate-700">
           
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 text-white font-extrabold text-lg mb-3">
-              <Eye className="w-5 h-5 text-sky-400" />
+            <div className="flex items-center space-x-2.5 text-white font-black text-lg mb-3">
+              <DrishtiLogo size={24} />
               <span>Drishti Care Diagnostic Suite</span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed max-w-md">
