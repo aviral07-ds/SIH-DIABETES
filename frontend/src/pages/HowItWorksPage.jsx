@@ -139,12 +139,12 @@ export default function HowItWorksPage({ setActiveTab }) {
         'परिणाम पर्ची प्रिंट / सहेजें: ए4 पोर्ट्रेट में 100% स्पष्ट, कोई खाली पन्ना नहीं।',
         'पीडीएफ पर्ची डाउनलोड: सीधे आपके डिवाइस में पीडीएफ फाइल डाउनलोड होती है।',
         'पूर्ण क्लिनिकल रिपोर्ट: मेडिकल ऑफिसर के डिजिटल हस्ताक्षर, बायोमार्कर तालिका और वैधानिक सूचना सहित।',
-        'आभा (ABHA) में पुश करें: राष्ट्रीय स्वास्थ्य प्राधिकरण के डिजिटल लॉकर में भेजने की सुविधा।'
+        'आभा (ABHA) में पुश करें: ABDM स्वास्थ्य लॉकर संगत FHIR JSON प्रारूप में डेटा निर्यात।'
       ] : [
         'Print Result Slip: crystal-clear A4 referral slip with zero blank pages.',
         'Save PDF Slip: 1-click direct file download for digital record archiving.',
         'Full ABDM Clinical Report: includes digital signature, biomarker table, and statutory notice.',
-        'Push to ABHA Record: integrates with the National Health Authority patient portal.'
+        'Push to ABHA Record: formats patient triage bundle ready for ABDM PHR health lockers.'
       ],
       tip: isHi 
         ? 'सुझाव: रेफरल पर्ची पर दोनों मूल फंडस स्कैन और एआई हीटमैप छपते हैं ताकि जिला अस्पताल का डॉक्टर तुरंत समझ सके।'
@@ -252,10 +252,10 @@ export default function HowItWorksPage({ setActiveTab }) {
         : 'It detects your device GPS or uses the camp location entered in Step 1. It queries an integrated registry of certified eye hospitals, civil district centers, and retina surgeons, giving phone contacts and instant 1-click Google Maps routes.'
     },
     {
-      q: isHi ? '5. क्या रिपोर्ट आयुष्मान भारत (ABDM) अनुपालन करती है?' : '5. Is the clinical report compliant with Ayushman Bharat (ABDM)?',
+      q: isHi ? '5. क्या रिपोर्ट आयुष्मान भारत (ABDM) मानकों के अनुकूल है?' : '5. Is the clinical report compatible with Ayushman Bharat (ABDM)?',
       a: isHi 
-        ? 'हाँ! रेफरल पर्ची और क्लिनिकल रिपोर्ट राष्ट्रीय स्वास्थ्य प्राधिकरण (NHA) के ABDM M3 मानकों के अनुरूप हैं, जिसमें 14-अंकीय आभा आईडी, डीआईसीओएम मेटाडेटा और सत्यापन टोकन शामिल हैं।'
-        : 'Yes! The clinical reports and referral slips adhere to National Health Authority (NHA) ABDM M3 specifications, including patient ABHA identifiers, SNOMED-CT/ICD-10 coding, and verifiable digital tokens.'
+        ? 'हाँ! रेफरल पर्ची और क्लिनिकल रिपोर्ट आयुष्मान भारत डिजिटल मिशन (ABDM M3) एफएचआईआर (FHIR) स्कीमा विनिर्देशों के अनुरूप संरचित हैं, जिसमें 14-अंकीय आभा (ABHA) आईडी, ICDR स्टेजिंग और सत्यापन योग्य संदर्भ टोकन शामिल हैं।'
+        : 'Yes! The clinical reports and referral slips are structured according to Ayushman Bharat Digital Mission (ABDM M3) FHIR schema specifications, including 14-digit ABHA identifiers, ICDR clinical classifications, and verifiable digital tokens.'
     }
   ];
 
@@ -668,7 +668,7 @@ export default function HowItWorksPage({ setActiveTab }) {
                   <Database className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   <h5 className="font-extrabold text-sm text-slate-900 dark:text-white">ABHA Record Export</h5>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Full DICOM / PDF diagnostic report compliant with National Health Authority Ayushman Bharat standards.
+                    Full DICOM / PDF diagnostic report formatted to Ayushman Bharat Digital Mission (ABDM M3) specifications.
                   </p>
                 </div>
 

@@ -77,8 +77,8 @@ export default function ReportPage({ data }) {
         <div className="flex items-center space-x-2 text-xs">
           <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
           <div>
-            <p className="font-bold">{t.reportComplianceTag || "ABDM Interoperable Clinical Triage Summary"}</p>
-            <p className="text-[11px] text-slate-400">National Health Authority Compliance • ABDM M3 Standard</p>
+            <p className="font-bold">{t.reportComplianceTag || "ABDM-Compatible Clinical Triage Summary"}</p>
+            <p className="text-[11px] text-slate-400">ABDM-Compatible (M3 FHIR Schema) • ICDR Standardized Triage</p>
           </div>
         </div>
 

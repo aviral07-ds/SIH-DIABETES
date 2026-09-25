@@ -1,8 +1,8 @@
 export const translations = {
   en: {
     // Navbar & Global
-    officialCompliance: "Official Diagnostic Triage Summary • ABDM Interoperable Medical Record • National Health Authority Compliance",
-    govtDept: "Govt. of Maharashtra • Public Health Dept",
+    officialCompliance: "AI-Assisted Diagnostic Triage Summary • ABDM-Compatible (M3 FHIR Schema) • ICDR Standard",
+    govtDept: "Rural Health Mission Prototype • Smart India Hackathon 2026",
     apiStatus: "API Status",
     clinicalTriage: "CLINICAL TRIAGE",
     pointOfCareEngine: "Point-of-Care Diagnostic Engine",
@@ -146,14 +146,14 @@ export const translations = {
     metabolicTitle: "Systemic & Metabolic Management",
 
     // Report Page
-    reportComplianceTag: "ABDM Interoperable Clinical Triage Summary • National Health Authority Compliance • ABDM M3 Standard",
+    reportComplianceTag: "ABDM-Compatible Clinical Triage Summary • ABDM M3 Standard Prototype",
     btnPrintReport: "Print Report",
     btnExportDicomPdf: "Export DICOM / PDF",
     btnPushAbha: "Push to ABHA Record",
     btnPushedAbha: "Pushed to ABHA!",
     networkTitle: "Drishti Care Diagnostic Network",
     triageSub: "TELE-OPHTHALMOLOGY POINT-OF-CARE TRIAGE",
-    reportGovtLabel: "Govt. of Maharashtra • Public Health Dept",
+    reportGovtLabel: "Tele-Ophthalmology Telehealth Node • SIH 2026",
     patientNameLabel: "PATIENT NAME",
     abhaIdLabel: "ABHA HEALTH IDENTIFIER",
     clinicalBgLabel: "CLINICAL BACKGROUND",
@@ -195,8 +195,8 @@ export const translations = {
 
   hi: {
     // Navbar & Global
-    officialCompliance: "आधिकारिक नैदानिक ट्राइएज सारांश • ABDM परस्पर मेल खाने वाला मेडिकल रिकॉर्ड • राष्ट्रीय स्वास्थ्य प्राधिकरण अनुपालन",
-    govtDept: "महाराष्ट्र सरकार • सार्वजनिक स्वास्थ्य विभाग",
+    officialCompliance: "एआई-सहायता प्राप्त नैदानिक ट्राइएज सारांश • ABDM-संगत (M3 FHIR स्कीमा) • ICDR मानक",
+    govtDept: "ग्रामीण स्वास्थ्य मिशन प्रोटोटाइप • स्मार्ट इंडिया हैकाथॉन 2026",
     apiStatus: "एपीआई स्थिति",
     clinicalTriage: "क्लिनिकल ट्राइएज",
     pointOfCareEngine: "प्वाइंट-ऑफ-केयर डायग्नोस्टिक इंजन",
@@ -340,14 +340,14 @@ export const translations = {
     metabolicTitle: "सिस्टमैटिक और मेटाबॉलिक प्रबंधन",
 
     // Report Page
-    reportComplianceTag: "ABDM परस्पर मेल खाने वाला क्लिनिकल ट्राइएज सारांश • राष्ट्रीय स्वास्थ्य प्राधिकरण अनुपालन",
+    reportComplianceTag: "ABDM-संगत क्लिनिकल ट्राइएज सारांश • ABDM M3 मानक प्रोटोटाइप",
     btnPrintReport: "रिपोर्ट प्रिंट करें",
     btnExportDicomPdf: "DICOM / PDF निर्यात करें",
     btnPushAbha: "आभा (ABHA) रिकॉर्ड में भेजें",
     btnPushedAbha: "आभा (ABHA) में भेजा गया!",
     networkTitle: "दृष्टि केयर डायग्नोस्टिक नेटवर्क",
     triageSub: "टेली-ऑप्थल्मोलॉजी प्वाइंट-ऑफ-केयर ट्राइएज",
-    reportGovtLabel: "महाराष्ट्र सरकार • सार्वजनिक स्वास्थ्य विभाग",
+    reportGovtLabel: "टेली-ऑप्थल्मोलॉजी टेलीहेल्थ नोड • SIH 2026",
     patientNameLabel: "रोगी का नाम",
     abhaIdLabel: "आभा स्वास्थ्य पहचानकर्ता",
     clinicalBgLabel: "नैदानिक पृष्ठभूमि",

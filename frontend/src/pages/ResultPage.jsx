@@ -366,14 +366,14 @@ export default function ResultPage({ data, setActiveTab }) {
                 {isHi ? "ABDM प्वाइंट-ऑफ-केयर क्लिनिकल रेफरल पर्ची" : "ABDM POINT-OF-CARE CLINICAL REFERRAL SLIP"}
               </p>
               <p className="text-[10px] text-slate-500 font-medium">
-                {isHi ? "राष्ट्रीय स्वास्थ्य प्राधिकरण • आयुष्मान भारत डिजिटल मिशन अनुपालन" : "National Health Authority • Ayushman Bharat Digital Mission (M3)"}
+                {isHi ? "आयुष्मान भारत डिजिटल मिशन (ABDM M3 स्कीमा अनुरूप)" : "Ayushman Bharat Digital Mission (ABDM M3 Schema Compatible)"}
               </p>
             </div>
           </div>
 
           <div className="text-right text-xs space-y-1">
             <span className="inline-block bg-slate-100 text-slate-800 font-bold px-3 py-1 rounded-md text-[11px] border border-slate-300">
-              {isHi ? "महाराष्ट्र शासन • सार्वजनिक आरोग्य विभाग" : "Govt. of Maharashtra • Public Health Dept"}
+              {isHi ? "ग्रामीण स्वास्थ्य मिशन प्रोटोटाइप • SIH 2026" : "Rural Health Mission Prototype • SIH 2026"}
             </span>
             <p className="text-[11px] text-slate-600 font-mono">
               Slip ID: <strong className="text-slate-950 font-bold">SLIP-{data.screeningId || '2026-0894'}</strong>
