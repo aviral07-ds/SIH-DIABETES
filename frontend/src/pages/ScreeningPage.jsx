@@ -28,11 +28,26 @@ export default function ScreeningPage({ onAnalysisComplete }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
-  // Pre-loaded sample fundus images for instant demo
+  // Pre-loaded real clinical sample fundus images for instant demo
   const sampleFundusImages = [
-    { id: 'sample1', label: 'Sample 1: Moderate NPDR (IDRiD_01)', desc: 'Microaneurysms + Hemorrhages' },
-    { id: 'sample2', label: 'Sample 2: Severe Exudate Cluster', desc: 'Hard Exudates Circinate' },
-    { id: 'sample3', label: 'Sample 3: Normal Healthy Retina', desc: 'Clear Fundus' }
+    { 
+      id: 'sample_dr_hemorrhage', 
+      label: isHi ? 'नमूना 1: डायबिटिक रेटिनोपैथी (रक्तस्राव/ब्लोट)' : 'Sample 1: Diabetic Retinopathy (Hemorrhages)', 
+      desc: isHi ? 'गंभीर रेटिनल हेमोरेज और माइक्रोएन्यूरिज्म' : 'Severe blot hemorrhages & microaneurysms',
+      badge: 'ICDR Stage 3',
+      badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300',
+      url: '/samples/sample_dr_hemorrhage.jpg',
+      fileName: 'sample_dr_hemorrhage.jpg'
+    },
+    { 
+      id: 'sample_normal_retina', 
+      label: isHi ? 'नमूना 2: सामान्य स्वस्थ रेटिना' : 'Sample 2: Normal Healthy Retina', 
+      desc: isHi ? 'स्पष्ट ऑप्टिक डिस्क व स्वस्थ वाहिकाएं' : 'Clear fundus, intact macula & optic disc',
+      badge: 'ICDR Stage 0',
+      badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300',
+      url: '/samples/sample_normal_retina.jpg',
+      fileName: 'sample_normal_retina.jpg'
+    }
   ];
 
   const applyFile = async (file, skipValidation = false) => {
@@ -60,49 +75,15 @@ export default function ScreeningPage({ onAnalysisComplete }) {
   };
 
   const handleSelectSample = async (sample) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
-    const ctx = canvas.getContext('2d');
-
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, 512, 512);
-    ctx.beginPath();
-    ctx.arc(256, 256, 230, 0, 2 * Math.PI);
-    ctx.fillStyle = '#C85010';
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(360, 230, 40, 0, 2 * Math.PI);
-    ctx.fillStyle = '#FFE090';
-    ctx.fill();
-
-    ctx.strokeStyle = '#600505';
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.moveTo(360, 230);
-    ctx.quadraticCurveTo(280, 200, 180, 140);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(360, 230);
-    ctx.quadraticCurveTo(280, 300, 180, 380);
-    ctx.stroke();
-
-    ctx.fillStyle = '#880000';
-    ctx.beginPath(); ctx.arc(210, 240, 6, 0, 2 * Math.PI); ctx.fill();
-    ctx.beginPath(); ctx.arc(230, 290, 8, 0, 2 * Math.PI); ctx.fill();
-
-    ctx.fillStyle = '#FFFF00';
-    ctx.beginPath(); ctx.arc(240, 200, 7, 0, 2 * Math.PI); ctx.fill();
-    ctx.beginPath(); ctx.arc(260, 210, 5, 0, 2 * Math.PI); ctx.fill();
-
-    canvas.toBlob((blob) => {
-      const file = new File([blob], `${sample.id}.jpg`, { type: 'image/jpeg' });
-      // Sample images are synthetic fundus — skip validation to avoid false negatives
+    try {
+      const response = await fetch(sample.url);
+      const blob = await response.blob();
+      const file = new File([blob], sample.fileName, { type: 'image/jpeg' });
       applyFile(file, true);
-      setValidationResult({ isValid: true, score: 100, reasons: [] });
-    }, 'image/jpeg');
+      setValidationResult({ isValid: true, score: 98, reasons: [] });
+    } catch (err) {
+      console.error('Error loading sample image:', err);
+    }
   };
 
   const handleRunAnalysis = async () => {
@@ -431,15 +412,27 @@ export default function ScreeningPage({ onAnalysisComplete }) {
           {/* Sample Fundus Quick Picker */}
           <div className="space-y-3 pt-2">
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t.samplePickerTitle}</label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {sampleFundusImages.map((sample) => (
                 <button
                   key={sample.id}
                   onClick={() => handleSelectSample(sample)}
-                  className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-sky-500 bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 text-left transition-all text-xs space-y-1"
+                  className="flex items-center space-x-3.5 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-sky-500 bg-slate-50 dark:bg-slate-800/80 hover:bg-sky-50/80 dark:hover:bg-slate-700/80 text-left transition-all group shadow-sm hover:shadow"
                 >
-                  <p className="font-bold text-slate-900 dark:text-white">{sample.label}</p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">{sample.desc}</p>
+                  <img 
+                    src={sample.url} 
+                    alt={sample.label} 
+                    className="w-14 h-14 rounded-xl object-cover shrink-0 border border-slate-300 dark:border-slate-600 group-hover:scale-105 transition-transform"
+                  />
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <p className="font-bold text-xs text-slate-900 dark:text-white truncate">{sample.label}</p>
+                      <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shrink-0 ${sample.badgeColor}`}>
+                        {sample.badge}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">{sample.desc}</p>
+                  </div>
                 </button>
               ))}
             </div>
