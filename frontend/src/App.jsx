@@ -10,6 +10,7 @@ import ReportPage from './pages/ReportPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
+import HelpChatbot from './components/HelpChatbot';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -72,6 +73,9 @@ export default function App() {
           isOpen={isApiSettingsOpen} 
           onClose={() => setIsApiSettingsOpen(false)} 
         />
+
+        {/* Floating multilingual help chatbot (11 Indian languages) */}
+        <HelpChatbot />
 
       </div>
     </LanguageProvider>
